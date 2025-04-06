@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "react-toastify";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../../../components/firebase";
 export default function LoginForm() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState("");
@@ -15,6 +17,8 @@ export default function LoginForm() {
     };
     try {
       console.log("Payload:", payload);
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("User logged in succesfully!");
     } catch (error: any) {
       console.log(error.message);
       toast.error(error.message, {
