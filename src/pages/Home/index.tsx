@@ -21,8 +21,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
           >
-            A smart companion app to support, track, and connect through every
-            step of the journey.
+            Empowering Warriors one Step at a time
           </motion.p>
           <motion.div
             initial={{ opacity: 0 }}

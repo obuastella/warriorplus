@@ -7,9 +7,12 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
       <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-        {/* Logo */}
-        <span className="text-2xl font-bold text-[#a65553]">SickleCellApp</span>
-
+        {/* Logo
+        <span className="text-2xl font-bold text-[#a65553]"></span> */}
+        <div className="flex justify-start items-center gap-x-2">
+          <img className="w-10 h-10" src="/images/logo.png" alt="logo" />
+          <h1 className="text-primary">Warrior +</h1>
+        </div>
         {/* Desktop Nav Links */}
         <div className="hidden md:flex gap-8 items-center">
           <a
