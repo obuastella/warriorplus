@@ -3,11 +3,13 @@ import { Eye, EyeOff, Loader } from "lucide-react";
 import { toast } from "react-toastify";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../../components/firebase";
+import { useNavigate } from "react-router-dom";
 export default function LoginForm() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -19,7 +21,9 @@ export default function LoginForm() {
       console.log("Payload:", payload);
       await signInWithEmailAndPassword(auth, email, password);
       console.log("User logged in succesfully!");
+      toast.success("User logged in successfully");
       setIsLoading(false);
+      navigate("/dashboard");
     } catch (error: any) {
       console.log(error.message);
       toast.error(error.message, {

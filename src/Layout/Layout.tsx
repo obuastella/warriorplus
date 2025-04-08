@@ -2,7 +2,6 @@ import { ReactNode, useState } from "react";
 import { LogOut, Menu, X } from "lucide-react";
 import Sidebar, { SidebarItem } from "../components/Sidebar";
 import BottomNav from "../components/BottomNav";
-// import SidebarItem from "../components/SidebarItem"; // Import SidebarItem here
 
 export default function Layout({ children }: { children: ReactNode }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false); // For mobile only
