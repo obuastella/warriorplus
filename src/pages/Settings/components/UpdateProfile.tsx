@@ -1,23 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Loader } from "lucide-react";
 import { toast } from "react-toastify";
+import { auth, db } from "../../../components/firebase";
+import { doc, getDoc } from "firebase/firestore";
 export default function UpdateProfile() {
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: "",
+  const [formData, setFormData] = useState<any>({
+    firstName: "",
+    lastName: "",
     email: "",
-    phone: "",
   });
-  //   useEffect(() => {
-  //     if (user) {
-  //       setFormData({
-  //         fullName: user.fullName || "",
-  //         email: user.email || "",
-  //         phone: user.phone || "",
-  //       });
-  //     }
-  //   }, [user]);
+
+  const fetchUserData = async () => {
+    auth.onAuthStateChanged(async (user: any) => {
+      const docRef = doc(db, "Users", user?.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setFormData(docSnap.data());
+      } else {
+        console.log("User is not logged in");
+      }
+    });
+  };
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -42,38 +50,38 @@ export default function UpdateProfile() {
       <div className="mt-8 grid gap-6 mb-6 md:grid-cols-2">
         <div>
           <label className="block mb-2 text-sm font-medium" htmlFor="fullName">
-            Full name<span className="text-red-600">*</span>
+            First Name<span className="text-red-600">*</span>
           </label>
           <input
-            id="fullName"
+            id="firstName"
             className="block p-2.5 w-full rounded-md bg-gray-50 border border-gray-300"
             type="text"
-            value={formData.fullName}
+            value={formData.firstName}
             onChange={handleChange}
           />
         </div>
         <div>
           <label className="block mb-2 text-sm font-medium" htmlFor="email">
-            Email<span className="text-red-600">*</span>
+            Last Name<span className="text-red-600">*</span>
           </label>
           <input
-            id="email"
+            id="lastName"
             className="block p-2.5 w-full rounded-md bg-gray-50 border border-gray-300"
             type="text"
-            value={formData.email}
+            value={formData.lastName}
             onChange={handleChange}
           />
         </div>
       </div>
       <div className="mb-6">
-        <label className="block mb-2 text-sm font-medium" htmlFor="phone">
-          Phone number
+        <label className="block mb-2 text-sm font-medium" htmlFor="email">
+          Email<span className="text-red-600">*</span>
         </label>
         <input
-          id="phone"
+          id="email"
           className="block p-2.5 w-full rounded-md bg-gray-50 border border-gray-300"
-          type="tel"
-          value={formData.phone}
+          type="text"
+          value={formData.email}
           onChange={handleChange}
         />
       </div>
