@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import Login from "./pages/(Auth)/Login/Login";
 import Layout from "./Layout/Layout";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import Settings from "./pages/Settings/Settings";
 
 export default function App() {
   return (
@@ -18,6 +19,14 @@ export default function App() {
           element={
             <Layout>
               <Dashboard />
+            </Layout>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <Layout>
+              <Settings />
             </Layout>
           }
         />
