@@ -1,0 +1,91 @@
+import {
+  BookHeart,
+  Home,
+  LogOut,
+  Settings,
+  TriangleAlert,
+  Users,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+export default function Sidebar({ isCollapsed }: { isCollapsed: boolean }) {
+  return (
+    <div
+      className={`h-full flex flex-col p-4 space-y-4 overflow-hidden transition-all duration-300 ${
+        isCollapsed ? "w-16" : "w-64"
+      } group hover:w-64`}
+    >
+      {/* Navigation Items */}
+      <div className="flex flex-col space-y-4">
+        <SidebarItem
+          icon={<Home size={20} />}
+          label="Home"
+          to="/dashboard"
+          isCollapsed={isCollapsed}
+        />
+        <SidebarItem
+          icon={<BookHeart size={20} />}
+          label="Journal"
+          to="#"
+          isCollapsed={isCollapsed}
+        />
+        <SidebarItem
+          icon={<Users size={20} />}
+          label="Join a Community"
+          to="#"
+          isCollapsed={isCollapsed}
+        />
+        <SidebarItem
+          icon={<TriangleAlert size={20} />}
+          label="SOS"
+          to="#"
+          isCollapsed={isCollapsed}
+        />
+        <SidebarItem
+          icon={<Settings size={20} />}
+          label="Settings"
+          to="/settings"
+          isCollapsed={isCollapsed}
+        />
+      </div>
+
+      {/* Logout Item at the bottom */}
+      <div className="mt-auto">
+        <SidebarItem
+          icon={<LogOut size={20} />}
+          label="Logout"
+          to="#"
+          isCollapsed={isCollapsed}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function SidebarItem({
+  icon,
+  label,
+  to,
+  isCollapsed,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  to: string;
+  isCollapsed: boolean;
+}) {
+  return (
+    <Link
+      to={to}
+      className="flex items-center text-white p-2 rounded hover:bg-secondary/40 transition-all"
+    >
+      <div className="w-6 flex justify-center">{icon}</div>
+      <span
+        className={`ml-4 text-sm font-medium transition-opacity duration-300 ${
+          isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
+        } group-hover:opacity-100 group-hover:w-auto group-hover:overflow-visible`}
+      >
+        {label}
+      </span>
+    </Link>
+  );
+}
