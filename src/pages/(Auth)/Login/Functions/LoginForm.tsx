@@ -22,8 +22,8 @@ export default function LoginForm() {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("User logged in succesfully!");
       toast.success("User logged in successfully");
-      setIsLoading(false);
       navigate("/dashboard");
+      setIsLoading(false);
     } catch (error: any) {
       console.log(error.message);
       toast.error(error.message, {

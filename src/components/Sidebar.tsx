@@ -6,9 +6,21 @@ import {
   TriangleAlert,
   Users,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { auth } from "./firebase";
+import { toast } from "react-toastify";
 
 export default function Sidebar({ isCollapsed }: { isCollapsed: boolean }) {
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      toast.success("Logged out successfully!");
+      navigate("/");
+    } catch (error: any) {
+      console.log("Error logging out: ", error?.message);
+    }
+  };
   return (
     <div
       className={`h-full flex flex-col p-4 space-y-4 overflow-hidden transition-all duration-300 ${
@@ -50,14 +62,14 @@ export default function Sidebar({ isCollapsed }: { isCollapsed: boolean }) {
       </div>
 
       {/* Logout Item at the bottom */}
-      <div className="mt-auto">
+      <button onClick={handleLogout} className="cursor-pointer mt-auto">
         <SidebarItem
           icon={<LogOut size={20} />}
           label="Logout"
-          to="#"
+          to="/"
           isCollapsed={isCollapsed}
         />
-      </div>
+      </button>
     </div>
   );
 }
