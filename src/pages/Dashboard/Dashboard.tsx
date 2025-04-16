@@ -8,7 +8,7 @@ export default function Dashboard() {
     <div className="space-y-8">
       <Header />
       <Statistics />
-      <section className="flex gap-x-10 justify-between w-full">
+      <section className="flex flex-col md:flex-row gap-x-10 justify-between w-full">
         <Remainders />
         <HydrationTracker />
       </section>

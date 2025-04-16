@@ -20,7 +20,7 @@ export default function HydrationTracker() {
   ];
 
   return (
-    <div className="w-[30%] p-6 rounded-xl">
+    <div className="w-full md:w-[30%] p-6 rounded-xl mb-8 md:mb-0">
       <h1 className="font-bold text-xl"> Tracker</h1>
       {tracker.map((track, id) => (
         <div key={id} className="mt-6 space-y-4 flex gap-x-4 gap-y-12">

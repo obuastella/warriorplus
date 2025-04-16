@@ -7,8 +7,8 @@ export default function Header() {
         <Hand size={40} className="animate-pulse" />
       </div>
       <div>
-        <h1 className="text-lg font-bold">Hello, User!</h1>
-        <p className="text-lg">
+        <h1 className="text-sm md:text-lg font-bold">Hello, User!</h1>
+        <p className="text-sm md:text-lg">
           Today is Monday. Remeber to stay hydrated and take your medication.
           Stay strong!
         </p>

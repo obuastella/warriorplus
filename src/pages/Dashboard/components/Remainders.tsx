@@ -48,7 +48,7 @@ export default function Remainders() {
 
   return (
     <>
-      <div className="flex flex-col items-start space-y-6 w-[70%] border-r border-[#f5f5f5] p-6">
+      <div className="flex flex-col items-start space-y-6 w-full md:w-[70%] border-r border-[#f5f5f5] p-6">
         <h1 className="font-bold text-xl">Medication Reminders</h1>
 
         <div className="flex space-x-3">

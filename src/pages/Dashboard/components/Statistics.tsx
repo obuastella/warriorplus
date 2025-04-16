@@ -19,11 +19,11 @@ export default function Statistics() {
     },
   ];
   return (
-    <div className="w-full flex md:flex-row flex-col flex-wrap justify-between items-center">
+    <div className="gap-y-6 w-full flex md:flex-row flex-col flex-wrap justify-between items-center">
       {Statistics.map((stats, index) => (
         <div
           key={index}
-          className="shadow-sm rounded-sm flex flex-col gap-y-1 justify-center items-center md:w-[32%] bg-[#f5f5f5] h-[200px]"
+          className="shadow-sm rounded-sm flex flex-col gap-y-1 justify-center items-center w-full  md:w-[32%] bg-[#f5f5f5] h-[200px]"
         >
           <div className="rounded-sm flex justify-center items-center w-10 h-10 bg-primary">
             {stats.icon}
