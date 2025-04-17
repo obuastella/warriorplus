@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Settings from "./pages/Settings/Settings";
 import { useEffect, useState } from "react";
 import { auth } from "./components/firebase";
+import Journal from "./pages/Journal/Journal";
 
 export default function App() {
   const [user, setUser] = useState<any>();
@@ -35,6 +36,14 @@ export default function App() {
           element={
             <Layout>
               <Dashboard />
+            </Layout>
+          }
+        />
+        <Route
+          path="/journal"
+          element={
+            <Layout>
+              <Journal />
             </Layout>
           }
         />

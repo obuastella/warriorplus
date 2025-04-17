@@ -38,7 +38,7 @@ export default function Sidebar({ isCollapsed }: { isCollapsed: boolean }) {
         <SidebarItem
           icon={<BookHeart size={20} />}
           label="Journal"
-          to="#"
+          to="/journal"
           isCollapsed={isCollapsed}
         />
         <SidebarItem
