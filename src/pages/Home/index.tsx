@@ -37,9 +37,12 @@ export default function Home() {
               animate={{ opacity: 1 }}
               transition={{ duration: 1.2, delay: 0.6 }}
             >
-              <button className="text-white bg-[#a65553] hover:bg-[#924846] px-8 py-3 text-lg rounded-xl shadow-lg transition transform hover:-translate-y-1">
+              <Link
+                to="/register"
+                className="text-white bg-[#a65553] hover:bg-[#924846] px-8 py-3 text-lg rounded-xl shadow-lg transition transform hover:-translate-y-1"
+              >
                 Get Started
-              </button>
+              </Link>
               <button className="text-[#a65553] border-2 border-[#a65553] hover:bg-[#f8e8e8] px-8 py-3 text-lg rounded-xl transition transform hover:-translate-y-1">
                 Learn More
               </button>
@@ -328,13 +331,13 @@ export default function Home() {
             <div>
               <h4 className="font-medium text-gray-800 mb-4">Contact</h4>
               <ul className="space-y-2">
-                <li>support@sicklecell.com</li>
-                <li>+1 (800) 555-0192</li>
+                <li>support@warriorplus.com</li>
+                <li>+234 81 403 9083</li>
               </ul>
             </div>
           </div>
           <div className="border-t pt-8 text-center text-sm">
-            &copy; {new Date().getFullYear()} SickleCell Support. All rights
+            &copy; {new Date().getFullYear()} Warriorplus Support. All rights
             reserved.
           </div>
         </footer>
