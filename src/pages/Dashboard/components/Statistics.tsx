@@ -25,7 +25,17 @@ export default function Statistics() {
           key={index}
           className="shadow-sm rounded-sm flex flex-col gap-y-1 justify-center items-center w-full  md:w-[32%] bg-[#f5f5f5] h-[200px]"
         >
-          <div className="rounded-sm flex justify-center items-center w-10 h-10 bg-primary">
+          <div
+            className={`rounded-sm flex justify-center items-center w-10 h-10  ${
+              stats.title === "Pain Journal"
+                ? "bg-blue-700"
+                : stats.title === "Mood Tracker"
+                ? "bg-secondary/60"
+                : stats.title === "Pain Crisis"
+                ? "bg-purple-600"
+                : ""
+            }`}
+          >
             {stats.icon}
           </div>
           <h2 className="text-lg">{stats.title}</h2>

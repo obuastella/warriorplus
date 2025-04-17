@@ -48,7 +48,7 @@ export default function Remainders() {
 
   return (
     <>
-      <div className="flex flex-col items-start space-y-6 w-full md:w-[70%] border-r border-[#f5f5f5] p-6">
+      <div className="flex flex-col items-start space-y-6 w-full md:w-[65%]  p-6">
         <h1 className="font-bold text-xl">Medication Reminders</h1>
 
         <div className="flex space-x-3">
@@ -86,7 +86,7 @@ export default function Remainders() {
                 key={dateStr}
                 onClick={() => setSelectedDate(dateStr)}
                 className={`flex flex-col items-center p-2.5 rounded-lg cursor-pointer border ${
-                  isCurrentDay ? "bg-primary text-white" : "bg-gray-100"
+                  isCurrentDay ? "bg-secondary/60 text-white" : "bg-gray-100"
                 } ${isSelected ? "ring-2 ring-blue-500" : ""}`}
               >
                 <div className="text-sm font-medium">{day.format("ddd")}</div>

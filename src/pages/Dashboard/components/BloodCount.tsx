@@ -69,7 +69,7 @@ export default function BloodCount() {
           {/* Progress bar */}
           <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-primary transition-all"
+              className="h-full bg-primary/40 transition-all"
               style={{ width: `${item.progress}%` }}
             />
           </div>
