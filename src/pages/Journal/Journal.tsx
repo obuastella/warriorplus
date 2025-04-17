@@ -20,11 +20,11 @@ export default function Journal() {
     },
   ];
   const handleSubmit = (e: any) => {
-    e.preveentDefault();
+    e.preventDefault();
   };
   return (
-    <div className="flex gap-x-4">
-      <div className="p-4 w-[30%] bg-primary/40 h-screen">
+    <div className="flex flex-col-reverse md:flex-row gap-x-4">
+      <div className="p-4 w-full md:w-[30%] bg-primary/40 h-screen">
         <h2 className="mb-4 text-lg font-semibold">Previous Entries</h2>
         {entries.map((entry, id) => (
           <div
@@ -38,7 +38,7 @@ export default function Journal() {
           </div>
         ))}
       </div>
-      <div className="p-4 border border-[#f5f5f5] w-[70%] h-screen">
+      <div className="p-4 border border-[#f5f5f5] w-full md:w-[70%] h-screen">
         <h2 className="text-lg font-semibold">Log a New Pain Episode</h2>
         <form onSubmit={handleSubmit} className="mt-4" action="">
           <div className="">
