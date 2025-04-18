@@ -2,8 +2,10 @@ import { Bell } from "lucide-react";
 import { useState } from "react";
 import EmergencyConfirm from "./modals/EmergencyConfirm";
 import { toast } from "react-toastify";
+import NoContact from "./NoContact";
 
 export default function Sos() {
+  const [emergencyContact] = useState(true); // this will base on if the user has emergency contacts registered
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,30 +23,37 @@ export default function Sos() {
   };
   return (
     <>
-      {!showConfirmationModal && (
+      {emergencyContact ? (
         <div>
-          <h1 className="mt-10 font-bold text-3xl text-center">
-            Emergency SOS
-          </h1>
-          <p className="text-center my-2">
-            Press the button below to send an alert to your emergency contact.
-          </p>
-          <button
-            onClick={() => setShowConfirmationModal(true)}
-            className="my-8 flex justify-center items-center bg-secondary w-72 h-72 rounded-full m-auto cursor-pointer"
-          >
-            <Bell
-              fill="white"
-              color="white"
-              size={150}
-              className="animate-pulse"
-            />
-          </button>
-          <p className="text-center mt-40">
-            A confirmation prompt will appear to ensure the alert is
-            intentional.
-          </p>
+          {!showConfirmationModal && (
+            <div>
+              <h1 className="mt-10 font-bold text-3xl text-center">
+                Emergency SOS
+              </h1>
+              <p className=" text-gray-600 text-center my-2">
+                Press the button below to send an alert to your emergency
+                contact.
+              </p>
+              <button
+                onClick={() => setShowConfirmationModal(true)}
+                className="my-8 flex justify-center items-center bg-secondary w-72 h-72 rounded-full m-auto cursor-pointer"
+              >
+                <Bell
+                  fill="white"
+                  color="white"
+                  size={150}
+                  className="animate-pulse"
+                />
+              </button>
+              <p className=" text-gray-600 text-center mt-40">
+                A confirmation prompt will appear to ensure the alert is
+                intentional.
+              </p>
+            </div>
+          )}
         </div>
+      ) : (
+        <NoContact />
       )}
       <EmergencyConfirm
         isOpen={showConfirmationModal}
