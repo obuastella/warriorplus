@@ -42,7 +42,7 @@ export default function SecuritySettings() {
   return (
     <>
       <h3 className="text-xl mt-8 mb-4 font-semibold">Change Password</h3>
-      <form onSubmit={handleSubmit}>
+      <form className="mb-20 md:mb-2" onSubmit={handleSubmit}>
         <div className="grid gap-3">
           <label htmlFor="current-password">Current Password</label>
           <PasswordInput

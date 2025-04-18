@@ -87,7 +87,7 @@ export default function UpdateProfile() {
       </div>
       <button
         onClick={updateProfile}
-        className="cursor-pointer bg-secondary/80 px-4 p-2 text-white rounded-md hover:bg-primary"
+        className="cursor-pointer bg-blue-700 px-4 p-2 text-white rounded-md hover:bg-primary"
       >
         {isLoading ? (
           <Loader size={24} className="mx-auto animate-spin" />
