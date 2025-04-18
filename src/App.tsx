@@ -14,6 +14,7 @@ import Settings from "./pages/Settings/Settings";
 import { useEffect, useState } from "react";
 import { auth } from "./components/firebase";
 import Journal from "./pages/Journal/Journal";
+import Sos from "./pages/SOS/Sos";
 
 export default function App() {
   const [user, setUser] = useState<any>();
@@ -44,6 +45,14 @@ export default function App() {
           element={
             <Layout>
               <Journal />
+            </Layout>
+          }
+        />
+        <Route
+          path="/sos"
+          element={
+            <Layout>
+              <Sos />
             </Layout>
           }
         />

@@ -50,7 +50,7 @@ export default function Sidebar({ isCollapsed }: { isCollapsed: boolean }) {
         <SidebarItem
           icon={<TriangleAlert size={20} />}
           label="SOS"
-          to="#"
+          to="/sos"
           isCollapsed={isCollapsed}
         />
         <SidebarItem

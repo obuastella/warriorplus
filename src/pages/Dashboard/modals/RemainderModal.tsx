@@ -1,4 +1,3 @@
-// components/ReminderModal.tsx
 import React from "react";
 
 interface ReminderModalProps {
