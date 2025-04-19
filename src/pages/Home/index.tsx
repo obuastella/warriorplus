@@ -7,12 +7,12 @@ export default function Home() {
     <div className="bg-gradient-to-b from-white to-[#faf0f0] min-h-screen">
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
-        {/* Hero Section - Split Layout */}
-        <section className="flex flex-col lg:flex-row items-center justify-between py-12 md:py-24 gap-12">
+        {/* Hero Section */}
+        <section className="flex flex-col  items-center justify-between py-12 md:py-20 gap-12">
           {/* Text Content - Left Side */}
-          <div className="lg:w-1/2 space-y-6">
+          <div className=" space-y-6">
             <motion.h1
-              className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#a65553] leading-tight"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#a65553] leading-tight text-center "
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -22,7 +22,7 @@ export default function Home() {
             </motion.h1>
 
             <motion.p
-              className="text-lg md:text-xl text-gray-700 max-w-lg"
+              className="text-lg md:text-xl text-gray-700 max-w-lg text-center m-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.3 }}
@@ -32,7 +32,7 @@ export default function Home() {
             </motion.p>
 
             <motion.div
-              className="flex gap-4 pt-4"
+              className="flex justify-center items-center gap-4 pt-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1.2, delay: 0.6 }}
@@ -67,7 +67,7 @@ export default function Home() {
         </section>
 
         {/* Stats Section */}
-        <section className="py-16 bg-white rounded-3xl shadow-sm mb-16">
+        <section className="w-full py-16 bg-primary text-white rounded-3xl shadow-sm mb-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
               { number: "10K+", label: "Community Members" },
@@ -82,10 +82,8 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
-                <p className="text-4xl font-bold text-[#a65553]">
-                  {stat.number}
-                </p>
-                <p className="text-gray-600 mt-2">{stat.label}</p>
+                <p className="text-4xl font-bold text-white">{stat.number}</p>
+                <p className="text-[#f5f5f5] mt-2">{stat.label}</p>
               </motion.div>
             ))}
           </div>
