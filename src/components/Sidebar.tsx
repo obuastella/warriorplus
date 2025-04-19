@@ -6,12 +6,13 @@ import {
   TriangleAlert,
   Users,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { auth } from "./firebase";
 import { toast } from "react-toastify";
 
 export default function Sidebar({ isCollapsed }: { isCollapsed: boolean }) {
   const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -43,7 +44,7 @@ export default function Sidebar({ isCollapsed }: { isCollapsed: boolean }) {
         />
         <SidebarItem
           icon={<Users size={20} />}
-          label="Join a Community"
+          label="Community"
           to="/community"
           isCollapsed={isCollapsed}
         />
@@ -85,10 +86,15 @@ export function SidebarItem({
   to: string;
   isCollapsed: boolean;
 }) {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+
   return (
     <Link
       to={to}
-      className="flex items-center text-white p-2 rounded hover:bg-secondary/40 transition-all"
+      className={`flex items-center p-2 rounded transition-all hover:bg-primary/20 ${
+        isActive ? "text-black font-semibold bg-white" : "text-black"
+      } hover:text-white`}
     >
       <div className="w-6 flex justify-center">{icon}</div>
       <span
