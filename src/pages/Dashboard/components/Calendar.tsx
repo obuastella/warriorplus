@@ -224,7 +224,7 @@ export default function CalendarWithReminders() {
     <div className="w-fit  md:w-full bg-white rounded-lg shadow">
       <div className="grid grid-cols-3">
         {/* Calendar Section */}
-        <div className="p-4 w-fit md:w-md lg:w-2xl">
+        <div className="p-4 w-[280px] md:w-md lg:w-2xl">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <h2 className="text-lg font-semibold">
