@@ -5,7 +5,7 @@ export default function Statistics() {
     {
       title: "Pain Journal",
       icon: <NotebookPen size={20} color="white" />,
-      entries: "8,200",
+      entries: "3 entries",
     },
     {
       title: "Mood Tracker",
@@ -23,7 +23,7 @@ export default function Statistics() {
       {Statistics.map((stats, index) => (
         <div
           key={index}
-          className="shadow-sm rounded-sm flex flex-col gap-y-1 justify-center items-center w-full  md:w-[32%] bg-[#f5f5f5] h-[200px]"
+          className="shadow-sm rounded-sm flex flex-col gap-y-1 justify-center items-center w-full  md:w-[32%] bg-white h-[200px]"
         >
           <div
             className={`rounded-sm flex justify-center items-center w-10 h-10  ${

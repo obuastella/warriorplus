@@ -23,12 +23,12 @@ export default function Sidebar({ isCollapsed }: { isCollapsed: boolean }) {
   };
   return (
     <div
-      className={`h-full flex flex-col p-4 space-y-4 overflow-hidden transition-all duration-300 ${
+      className={`text-black h-full flex flex-col p-4 space-y-4 overflow-hidden transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
       } group hover:w-64`}
     >
       {/* Navigation Items */}
-      <div className="flex flex-col space-y-4">
+      <div className="text-black flex flex-col space-y-4">
         <SidebarItem
           icon={<Home size={20} />}
           label="Home"
