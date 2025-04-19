@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { auth } from "./components/firebase";
 import Journal from "./pages/Journal/Journal";
 import Sos from "./pages/SOS/Sos";
+import Community from "./pages/Community/Community";
 
 export default function App() {
   const [user, setUser] = useState<any>();
@@ -45,6 +46,14 @@ export default function App() {
           element={
             <Layout>
               <Journal />
+            </Layout>
+          }
+        />
+        <Route
+          path="/community"
+          element={
+            <Layout>
+              <Community />
             </Layout>
           }
         />

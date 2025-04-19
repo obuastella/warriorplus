@@ -44,7 +44,7 @@ export default function Sidebar({ isCollapsed }: { isCollapsed: boolean }) {
         <SidebarItem
           icon={<Users size={20} />}
           label="Join a Community"
-          to="#"
+          to="/community"
           isCollapsed={isCollapsed}
         />
         <SidebarItem
