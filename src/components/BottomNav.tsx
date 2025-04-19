@@ -6,9 +6,9 @@ export default function BottomNav() {
 
   const navItems = [
     { to: "/dashboard", icon: <LayoutDashboard />, label: "Dashboard" },
-    { to: "#", icon: <BookHeart />, label: "Journal" },
-    { to: "#", icon: <User />, label: "Profile" },
-    { to: "#", icon: <TriangleAlert />, label: "SOS" },
+    { to: "/journal", icon: <BookHeart />, label: "Journal" },
+    { to: "/settings", icon: <User />, label: "Profile" },
+    { to: "/sos", icon: <TriangleAlert />, label: "SOS" },
   ];
 
   return (
