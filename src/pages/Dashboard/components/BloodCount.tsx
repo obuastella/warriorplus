@@ -1,5 +1,8 @@
-export default function BloodCount() {
-  const bloodMetrics = [
+//@ts-nocheck
+import { useState, forwardRef, useImperativeHandle } from "react";
+
+const BloodCount = forwardRef((props, ref) => {
+  const [bloodMetrics, setBloodMetrics] = useState([
     {
       title: "Hemoglobin",
       values: {
@@ -27,7 +30,7 @@ export default function BloodCount() {
       },
       progress: 90,
     },
-  ];
+  ]);
 
   const statusColor: any = {
     Low: "text-red-500",
@@ -35,8 +38,13 @@ export default function BloodCount() {
     High: "text-yellow-500",
   };
 
+  // Expose the updateBloodMetrics function to parent components
+  useImperativeHandle(ref, () => (newMetrics: any) => {
+    setBloodMetrics(newMetrics);
+  });
+
   return (
-    <div className="mt-10 w-full  mx-auto space-y-6">
+    <div className="mt-10 w-full mx-auto space-y-6">
       {/* Header with labels */}
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-bold text-gray-800">Blood Count</h1>
@@ -77,4 +85,6 @@ export default function BloodCount() {
       ))}
     </div>
   );
-}
+});
+
+export default BloodCount;

@@ -233,7 +233,7 @@ export default function CalendarWithReminders() {
               <select
                 value={displayedYear}
                 onChange={handleYearChange}
-                className="ml-2 p-1 border rounded"
+                className="ml-2 p-1 border border-gray-400 rounded"
               >
                 {availableYears.map((year) => (
                   <option key={year} value={year}>
