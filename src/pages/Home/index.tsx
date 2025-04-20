@@ -178,12 +178,12 @@ export default function Home() {
               {
                 title: "Set Up Your Tools",
                 desc: "Customize reminders and emergency contacts",
-                img: "/images/dashboard.png", // App configuration UI
+                img: "/images/dashboard-screenshot.png", // App configuration UI
               },
               {
                 title: "Track & Connect",
                 desc: "Start logging and join the community",
-                img: "/images/dashboard.png", // Dashboard view
+                img: "/images/record-screenshot.png", // Dashboard view
               },
             ].map((step, i) => (
               <motion.div

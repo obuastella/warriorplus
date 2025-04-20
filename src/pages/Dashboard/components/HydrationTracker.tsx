@@ -1,16 +1,13 @@
 import { useState } from "react";
 import { Info, ShieldAlert, Users, Pencil } from "lucide-react";
 import BloodCountModal from "../modals/BloodCountModal";
+import { useNavigate } from "react-router-dom";
 
 export default function HydrationTracker({ onBloodCountUpdate }: any) {
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   const tracker = [
-    {
-      title: "Emergency SOS",
-      icon: <ShieldAlert color="white" />,
-      status: "Activated",
-    },
     {
       title: "Community",
       icon: <Info color="white" />,
@@ -22,7 +19,9 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
       status: "Recorded",
     },
   ];
-
+  const handleEmergency = () => {
+    navigate("/sos");
+  };
   const handleSaveBloodCount = (updatedMetrics: any) => {
     // Pass the updated metrics to the parent component
     onBloodCountUpdate(updatedMetrics);
@@ -32,6 +31,22 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
   return (
     <div className="w-full md:w-[32%] p-6 rounded-xl mb-8 md:mb-0">
       <h1 className="font-bold text-xl"> Tracker</h1>
+      <div className="mt-6 space-y-4 flex gap-x-4 gap-y-12">
+        <div
+          className={`flex justify-center items-center p-2.5 w-16 h-16 rounded-sm bg-blue-400`}
+        >
+          <ShieldAlert color="white" />
+        </div>
+        <div>
+          <h2 className="font-semibold text-base">Emergency SOS</h2>
+          <button
+            className="rounded-lg bg-secondary/80 text-white text-sm px-5 p-2 cursor-pointer"
+            onClick={handleEmergency}
+          >
+            Alert Contact
+          </button>
+        </div>
+      </div>
       {tracker.map((track, id) => (
         <div key={id} className="mt-6 space-y-4 flex gap-x-4 gap-y-12">
           <div
@@ -69,6 +84,7 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
           </button>
         </div>
       </div>
+
       <BloodCountModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
