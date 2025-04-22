@@ -2,6 +2,7 @@ import {
   BookHeart,
   Home,
   LogOut,
+  PillBottle,
   Settings,
   TriangleAlert,
   Users,
@@ -40,6 +41,12 @@ export default function Sidebar({ isCollapsed }: { isCollapsed: boolean }) {
           icon={<BookHeart size={20} />}
           label="Journal"
           to="/journal"
+          isCollapsed={isCollapsed}
+        />
+        <SidebarItem
+          icon={<PillBottle size={20} />}
+          label="Medication"
+          to="/medication-tracker"
           isCollapsed={isCollapsed}
         />
         <SidebarItem
