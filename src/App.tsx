@@ -17,6 +17,8 @@ import Journal from "./pages/Journal/Journal";
 import Sos from "./pages/SOS/Sos";
 import Community from "./pages/Community/Community";
 import MedicationTracker from "./pages/MedicationTracker/MedicationTracker";
+import VerifyEmail from "./pages/(Auth)/VerifyEmail/VerifyEmail";
+import VerifyComplete from "./pages/(Auth)/VerifyEmail/VerifyComplete";
 
 export default function App() {
   const [user, setUser] = useState<any>();
@@ -30,10 +32,15 @@ export default function App() {
       <Routes>
         <Route element={<Home />} path="/" />
         <Route
-          element={user ? <Navigate to="/dashboard" /> : <Register />}
+          element={
+            user?.emailVerified ? <Navigate to="/dashboard" /> : <Register />
+          }
           path="/register"
         />
+        <Route element={<VerifyEmail />} path="/verify-email" />
+        <Route element={<VerifyComplete />} path="/verify-complete" />
         <Route element={<Login />} path="/login" />
+
         <Route
           path="/dashboard"
           element={

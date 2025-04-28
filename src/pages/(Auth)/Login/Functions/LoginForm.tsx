@@ -1,32 +1,46 @@
 import { useState } from "react";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import { toast } from "react-toastify";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../../../components/firebase";
+import { auth, db } from "../../../../components/firebase";
 import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, updateDoc } from "firebase/firestore";
+
 export default function LoginForm() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const user = userCredential.user;
+    if (!user.emailVerified) {
+      toast.error("Please verify your email before logging in.");
+      return;
+    }
     setIsLoading(true);
-    const payload = {
-      email: email,
-      password: password,
-    };
+
     try {
-      console.log("Payload:", payload);
       await signInWithEmailAndPassword(auth, email, password);
       console.log("User logged in succesfully!");
       toast.success("User logged in successfully");
       navigate("/dashboard");
       setIsLoading(false);
+      if (user.emailVerified) {
+        await updateDoc(doc(db, "Users", user.uid), {
+          isVerified: true,
+        });
+      }
     } catch (error: any) {
       console.log(error.message);
-      toast.error(error.message, {
+      toast.error("Invalid email or Password", {
         position: "top-right",
       });
       setIsLoading(false);

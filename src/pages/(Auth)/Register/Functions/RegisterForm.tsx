@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { validatePassword } from "../../../../utils/ValidatePassword";
 import { Eye, EyeOff, Loader } from "lucide-react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import { auth, db } from "../../../../components/firebase";
 import { setDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../../../config/Config";
 export default function RegisterForm() {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
@@ -55,18 +59,24 @@ export default function RegisterForm() {
       setIsLoading(false);
       const user = auth.currentUser;
       if (user) {
+        const actionCodeSettings = {
+          url: `${BASE_URL}/login`,
+          handleCodeInApp: true,
+        };
+        await sendEmailVerification(user, actionCodeSettings);
         setDoc(doc(db, "Users", user.uid), {
           email: user.email,
           firstName: firstName,
           lastName: lastName,
+          isVerified: false,
         });
       }
       console.log(user);
       console.log("User registered successfully!");
-      toast.success("User registered successfully!", {
+      toast.success("Verification email sent! Please check your inbox.", {
         position: "top-right",
       });
-      navigate("/login");
+      navigate("/verify-email");
     } catch (error: any) {
       console.log(error.message);
       toast.error(error.message, {
