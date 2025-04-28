@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import { toast } from "react-toastify";
-// import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../../../components/firebase";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -27,12 +26,8 @@ export default function LoginForm() {
       return;
     }
     setIsLoading(true);
-    // const payload = {
-    //   email: email,
-    //   password: password,
-    // };
+
     try {
-      // console.log("Payload:", payload);
       await signInWithEmailAndPassword(auth, email, password);
       console.log("User logged in succesfully!");
       toast.success("User logged in successfully");
@@ -45,7 +40,7 @@ export default function LoginForm() {
       }
     } catch (error: any) {
       console.log(error.message);
-      toast.error(error.message, {
+      toast.error("Invalid email or Password", {
         position: "top-right",
       });
       setIsLoading(false);

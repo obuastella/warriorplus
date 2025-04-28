@@ -9,6 +9,7 @@ import { auth, db } from "../../../../components/firebase";
 import { setDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../../../config/Config";
 export default function RegisterForm() {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
@@ -59,7 +60,7 @@ export default function RegisterForm() {
       const user = auth.currentUser;
       if (user) {
         const actionCodeSettings = {
-          url: "http://localhost:5173/login",
+          url: `${BASE_URL}/login`,
           handleCodeInApp: true,
         };
         await sendEmailVerification(user, actionCodeSettings);
