@@ -47,14 +47,7 @@ export default function RegisterForm() {
       setError(validationError);
       return;
     }
-    const payload = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: password,
-    };
     try {
-      console.log("Payload:", payload);
       await createUserWithEmailAndPassword(auth, email, password);
       setIsLoading(false);
       const user = auth.currentUser;
@@ -71,17 +64,22 @@ export default function RegisterForm() {
           isVerified: false,
         });
       }
-      console.log(user);
-      console.log("User registered successfully!");
+
       toast.success("Verification email sent! Please check your inbox.", {
         position: "top-right",
       });
       navigate("/verify-email");
     } catch (error: any) {
       console.log(error.message);
-      toast.error(error.message, {
-        position: "top-right",
-      });
+      if (error.message === "Firebase: Error (auth/email-already-in-use).") {
+        toast.error("Email already in use", {
+          position: "top-right",
+        });
+      } else {
+        toast.error("An error occured", {
+          position: "top-right",
+        });
+      }
       setIsLoading(false);
     }
   };

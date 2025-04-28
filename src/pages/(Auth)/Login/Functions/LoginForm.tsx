@@ -15,20 +15,19 @@ export default function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const user = userCredential.user;
-    if (!user.emailVerified) {
-      toast.error("Please verify your email before logging in.");
-      return;
-    }
     setIsLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      if (!user.emailVerified) {
+        toast.error("Please verify your email before logging in.");
+        return;
+      }
       console.log("User logged in succesfully!");
       toast.success("User logged in successfully");
       navigate("/dashboard");
@@ -39,10 +38,13 @@ export default function LoginForm() {
         });
       }
     } catch (error: any) {
-      console.log(error.message);
-      toast.error("Invalid email or Password", {
-        position: "top-right",
-      });
+      if (error.message === "Firebase: Error (auth/invalid-credential).") {
+        toast.error("Invalid email or Password", {
+          position: "top-right",
+        });
+      } else {
+        toast.error(error.message);
+      }
       setIsLoading(false);
     }
   };
