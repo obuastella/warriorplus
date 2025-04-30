@@ -20,6 +20,7 @@ import MedicationTracker from "./pages/MedicationTracker/MedicationTracker";
 import VerifyEmail from "./pages/(Auth)/VerifyEmail/VerifyEmail";
 import VerifyComplete from "./pages/(Auth)/VerifyEmail/VerifyComplete";
 import ForgotPassword from "./pages/(Auth)/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/(Auth)/ResetPassword/ResetPassword";
 
 export default function App() {
   const [user, setUser] = useState<any>();
@@ -42,6 +43,7 @@ export default function App() {
         <Route element={<VerifyComplete />} path="/verify-complete" />
         <Route element={<Login />} path="/login" />
         <Route element={<ForgotPassword />} path="/forgot-password" />
+        <Route element={<ResetPassword />} path="/reset-password" />
 
         <Route
           path="/dashboard"

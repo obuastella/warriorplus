@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { KeyRound, ArrowLeft, CheckCircle, Loader } from "lucide-react";
 import { Link } from "react-router-dom";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { toast } from "react-toastify";
+import { auth } from "../../../components/firebase";
 
 const ForgotPassword = ({}) => {
   const [email, setEmail] = useState("");
@@ -14,11 +17,20 @@ const ForgotPassword = ({}) => {
     setIsSubmitting(true);
 
     try {
-      console.log(email);
-      //   await onSubmit(email);
+      await sendPasswordResetEmail(auth, email, {
+        url: "http://localhost:5173/reset-password",
+        handleCodeInApp: true,
+      });
       setSuccess(true);
+      toast.success("If the email is registered, a reset link has been sent.", {
+        position: "top-right",
+      });
     } catch (err: any) {
+      console.error(err);
       setError(err.message || "Failed to send reset link. Please try again.");
+
+      toast.error("Error sending reset email", { position: "top-right" });
+      setIsSubmitting(false);
     } finally {
       setIsSubmitting(false);
     }
