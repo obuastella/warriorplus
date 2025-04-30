@@ -35,7 +35,7 @@ export default function Login() {
               Don&apos;t have an account?{" "}
               <span className="text-primary hover:underline">Sign Up</span>
             </Link>
-            <Link className="text-sm hover:underline" to="/forgot-password">
+            <Link to="/forgot-password" className="text-sm hover:underline">
               Forgot password?
             </Link>
           </div>

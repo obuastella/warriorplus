@@ -19,6 +19,7 @@ import Community from "./pages/Community/Community";
 import MedicationTracker from "./pages/MedicationTracker/MedicationTracker";
 import VerifyEmail from "./pages/(Auth)/VerifyEmail/VerifyEmail";
 import VerifyComplete from "./pages/(Auth)/VerifyEmail/VerifyComplete";
+import ForgotPassword from "./pages/(Auth)/ForgotPassword/ForgotPassword";
 
 export default function App() {
   const [user, setUser] = useState<any>();
@@ -40,6 +41,7 @@ export default function App() {
         <Route element={<VerifyEmail />} path="/verify-email" />
         <Route element={<VerifyComplete />} path="/verify-complete" />
         <Route element={<Login />} path="/login" />
+        <Route element={<ForgotPassword />} path="/forgot-password" />
 
         <Route
           path="/dashboard"
