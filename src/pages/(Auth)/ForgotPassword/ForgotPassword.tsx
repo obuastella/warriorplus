@@ -18,7 +18,7 @@ const ForgotPassword = ({}) => {
 
     try {
       await sendPasswordResetEmail(auth, email, {
-        url: "http://localhost:5173/reset-password",
+        url: "http://localhost:5173/login",
         handleCodeInApp: true,
       });
       setSuccess(true);
