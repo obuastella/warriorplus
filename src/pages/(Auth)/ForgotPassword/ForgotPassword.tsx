@@ -18,7 +18,7 @@ const ForgotPassword = ({}) => {
 
     try {
       await sendPasswordResetEmail(auth, email, {
-        url: "http://localhost:5173/login",
+        url: "https://warriorplus.vercel.app/login",
         handleCodeInApp: true,
       });
       setSuccess(true);

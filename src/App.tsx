@@ -1,9 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Register from "./pages/(Auth)/Register/Register";
 import { ToastContainer } from "react-toastify";
@@ -11,8 +6,6 @@ import Login from "./pages/(Auth)/Login/Login";
 import Layout from "./Layout/Layout";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Settings from "./pages/Settings/Settings";
-import { useEffect, useState } from "react";
-import { auth } from "./components/firebase";
 import Journal from "./pages/Journal/Journal";
 import Sos from "./pages/SOS/Sos";
 import Community from "./pages/Community/Community";
@@ -21,76 +14,100 @@ import VerifyEmail from "./pages/(Auth)/VerifyEmail/VerifyEmail";
 import VerifyComplete from "./pages/(Auth)/VerifyEmail/VerifyComplete";
 import ForgotPassword from "./pages/(Auth)/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/(Auth)/ResetPassword/ResetPassword";
+import PublicRoute from "./components/PublicRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
-  const [user, setUser] = useState<any>();
-  useEffect(() => {
-    auth.onAuthStateChanged((user) => {
-      setUser(user);
-    });
-  });
   return (
     <Router>
       <Routes>
-        <Route element={<Home />} path="/" />
         <Route
+          path="/"
           element={
-            user?.emailVerified ? <Navigate to="/dashboard" /> : <Register />
+            <PublicRoute>
+              <Home />
+            </PublicRoute>
           }
-          path="/register"
         />
-        <Route element={<VerifyEmail />} path="/verify-email" />
-        <Route element={<VerifyComplete />} path="/verify-complete" />
-        <Route element={<Login />} path="/login" />
-        <Route element={<ForgotPassword />} path="/forgot-password" />
-        <Route element={<ResetPassword />} path="/reset-password" />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/verify-complete" element={<VerifyComplete />} />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route
           path="/dashboard"
           element={
-            <Layout>
-              <Dashboard />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/journal"
           element={
-            <Layout>
-              <Journal />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Journal />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/medication-tracker"
           element={
-            <Layout>
-              <MedicationTracker />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <MedicationTracker />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/community"
           element={
-            <Layout>
-              <Community />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Community />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/sos"
           element={
-            <Layout>
-              <Sos />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Sos />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/settings"
           element={
-            <Layout>
-              <Settings />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Settings />
+              </Layout>
+            </ProtectedRoute>
           }
         />
       </Routes>
