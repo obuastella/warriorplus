@@ -16,7 +16,6 @@ import ForgotPassword from "./pages/(Auth)/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/(Auth)/ResetPassword/ResetPassword";
 import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
-
 export default function App() {
   return (
     <Router>

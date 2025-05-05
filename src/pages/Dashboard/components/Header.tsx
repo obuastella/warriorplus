@@ -1,7 +1,11 @@
 import { Hand } from "lucide-react";
 import { motion } from "framer-motion";
+import useUserData from "../../../hooks/useUserData";
+import { useUserStore } from "../../../store/userStore";
 
 export default function Header() {
+  useUserData();
+  const { firstName } = useUserStore();
   return (
     <motion.section
       className="rounded-sm relative p-6 md:p-8 flex items-start gap-4 w-full h-32 md:h-40  overflow-hidden"
@@ -33,7 +37,7 @@ export default function Header() {
             animate={{ x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            Hello, Warrior
+            Hello, {firstName}
           </motion.h1>
           <motion.p
             className="text-sm md:text-base text-white/90 mt-1 drop-shadow-sm"
