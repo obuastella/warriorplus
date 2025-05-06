@@ -19,6 +19,7 @@ export default function Statistics() {
     },
   ];
   return (
+    // wip
     <div className="gap-y-6 w-full flex md:flex-row flex-col flex-wrap justify-between items-center">
       {Statistics.map((stats, index) => (
         <div
