@@ -69,6 +69,11 @@ export default function RegisterForm() {
           remindersCount: 0,
           painCrisisLevel: "None",
         });
+        await setDoc(doc(db, "Users", user.uid, "tracker", "data"), {
+          emergencyContact: "None",
+          community: "None",
+          bloodCount: [],
+        });
       }
       useUserStore.getState().setStatistics({
         painJournalEntries: 0,
