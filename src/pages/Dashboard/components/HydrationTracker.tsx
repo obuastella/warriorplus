@@ -84,7 +84,7 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
             className="rounded-lg bg-primary text-white text-sm px-5 p-2 cursor-pointer"
             onClick={() => setShowModal(true)}
           >
-            {tracker.bloodCount.length === 0 ? "Record" : "Recorded"}
+            {tracker.bloodCount.length === 0 ? "Record" : "Edit"}
           </button>
         </div>
       </div>
