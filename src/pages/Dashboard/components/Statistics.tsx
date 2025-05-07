@@ -1,25 +1,28 @@
-import { BookHeart, NotebookPen, Smile } from "lucide-react";
+import { CalendarDays, NotebookPen, Smile } from "lucide-react";
+import useUserStatistics from "../../../hooks/useUserStatistics";
+import { useUserStore } from "../../../store/userStore";
 
 export default function Statistics() {
+  const { statistics } = useUserStore();
+  useUserStatistics();
   const Statistics = [
     {
       title: "Pain Journal",
       icon: <NotebookPen size={20} color="white" />,
-      entries: "3 entries",
+      entries: `${statistics.painJournalEntries} entries`,
     },
     {
-      title: "Mood Tracker",
-      icon: <BookHeart size={20} color="white" />,
-      entries: "Positive",
+      title: "Remainders",
+      icon: <CalendarDays size={20} color="white" />,
+      entries: `${statistics.remindersCount}`,
     },
     {
       title: "Pain Crisis",
       icon: <Smile size={20} color="white" />,
-      entries: "Severe",
+      entries: statistics.painCrisisLevel,
     },
   ];
   return (
-    // wip
     <div className="gap-y-6 w-full flex md:flex-row flex-col flex-wrap justify-between items-center">
       {Statistics.map((stats, index) => (
         <div
@@ -30,7 +33,7 @@ export default function Statistics() {
             className={`rounded-sm flex justify-center items-center w-10 h-10  ${
               stats.title === "Pain Journal"
                 ? "bg-blue-700"
-                : stats.title === "Mood Tracker"
+                : stats.title === "Remainders"
                 ? "bg-secondary/60"
                 : stats.title === "Pain Crisis"
                 ? "bg-purple-600"
