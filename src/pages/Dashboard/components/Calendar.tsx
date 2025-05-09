@@ -9,8 +9,18 @@ import {
   Trash2,
   Plus,
 } from "lucide-react";
+import {
+  addDoc,
+  collection,
+  doc,
+  increment,
+  updateDoc,
+} from "firebase/firestore";
+import { auth, db } from "../../../components/firebase";
+import { useReminderStore } from "../../../store/useRemainderStore";
 
 export default function CalendarWithReminders() {
+  const user: any = auth.currentUser;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [displayedMonth, setDisplayedMonth] = useState(new Date().getMonth());
@@ -19,7 +29,7 @@ export default function CalendarWithReminders() {
   const [showModal, setShowModal] = useState(false);
   const [reminders, setReminders] = useState([]);
   const [currentReminder, setCurrentReminder] = useState({
-    id: null,
+    id: "",
     title: "",
     description: "",
     date: null,
@@ -35,7 +45,16 @@ export default function CalendarWithReminders() {
     }
     setAvailableYears(years);
   }, []);
+  const { remindersData, fetchReminders, updateReminder, deleteReminder } =
+    useReminderStore();
 
+  useEffect(() => {
+    if (user) fetchReminders(user.uid);
+  }, [user]);
+
+  // const handleDeleteReminder = async (id: string) => {
+  //   if (user) await deleteReminder(user.uid, id);
+  // };
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate();
   };
@@ -112,26 +131,69 @@ export default function CalendarWithReminders() {
     setReminders(reminders.filter((reminder) => reminder.id !== id));
   };
 
-  const handleSaveReminder = () => {
+  const handleSaveReminder = async () => {
     if (!currentReminder.title.trim()) {
       alert("Please enter a reminder title");
       return;
     }
 
     if (editMode) {
-      // Update existing reminder
-      setReminders(
-        reminders.map((reminder) =>
-          reminder.id === currentReminder.id ? currentReminder : reminder
-        )
-      );
+      if (user) {
+        console.log("Remainder id:", currentReminder?.id);
+        try {
+          await updateReminder(user.uid, currentReminder?.id, {
+            title: currentReminder.title,
+            description: currentReminder.description,
+            date: currentReminder.date,
+          });
+          console.log("Updated");
+        } catch (e: any) {
+          console.log("error occured", e);
+        }
+      }
     } else {
       // Add new reminder
-      const newReminder = {
-        ...currentReminder,
-        id: Date.now(), // Simple unique ID
-      };
-      setReminders([...reminders, newReminder]);
+      // const newReminder = {
+      //   ...currentReminder,
+      //   createdAt: new Date().toISOString(),
+      //   id: Date.now().toString(),
+      // };
+      // setReminders([...reminders, newReminder]);
+      // added
+      try {
+        // Add new reminder to Firestore under user-specific subcollection
+        // await addDoc(
+        //   collection(db, "Users", user.uid, "Reminders"),
+        //   newReminder
+        // );
+        const docRef = await addDoc(
+          collection(db, "Users", user.uid, "Reminders"),
+          {
+            title: currentReminder.title,
+            description: currentReminder.description,
+            date: currentReminder.date,
+            createdAt: new Date().toISOString(),
+          }
+        );
+        // Increment the remindersCount in statistics/summary
+        const summaryRef = doc(db, "Users", user.uid, "statistics", "summary");
+        await updateDoc(summaryRef, {
+          remindersCount: increment(1),
+        });
+
+        const newReminder = {
+          id: docRef.id, // ✅ Firestore-generated ID
+          title: currentReminder.title,
+          description: currentReminder.description,
+          date: currentReminder.date,
+        };
+        setReminders((prev: any) => [...prev, newReminder]);
+        console.log("New remainder set:", newReminder);
+
+        setShowModal(false);
+      } catch (error) {
+        console.error("Error saving reminder:", error);
+      }
     }
 
     setShowModal(false);
@@ -215,11 +277,6 @@ export default function CalendarWithReminders() {
 
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Sort reminders by date
-  const sortedReminders = [...reminders].sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
-
   return (
     <div className="w-fit  md:w-full bg-white rounded-lg shadow">
       <div className="grid grid-cols-3">
@@ -290,10 +347,10 @@ export default function CalendarWithReminders() {
         </div>
 
         <div className="space-y-3 max-h-96 overflow-y-auto">
-          {sortedReminders.length === 0 ? (
+          {remindersData.length === 0 ? (
             <p className="text-gray-500 text-center">No reminders set</p>
           ) : (
-            sortedReminders.map((reminder) => (
+            remindersData.map((reminder: any) => (
               <div
                 key={reminder.id}
                 className="p-3 border rounded-lg hover:bg-gray-50"
@@ -302,7 +359,7 @@ export default function CalendarWithReminders() {
                   <div>
                     <p className="font-medium">{reminder.title}</p>
                     <p className="text-sm text-gray-500">
-                      {formatDate(new Date(reminder.date))}
+                      {formatDate(new Date(reminder.createdAt))}
                     </p>
                     {reminder.description && (
                       <p className="text-sm mt-1">{reminder.description}</p>
@@ -353,7 +410,7 @@ export default function CalendarWithReminders() {
                   <Calendar size={18} className="text-gray-500 mr-2" />
                   <span>
                     {currentReminder.date
-                      ? formatDate(new Date(currentReminder.date))
+                      ? formatDate(new Date(currentReminder.createdAt))
                       : "Select a date"}
                   </span>
                 </div>
