@@ -1,5 +1,4 @@
 //@ts-nocheck
-
 import { useState, useEffect } from "react";
 import {
   ChevronLeft,
@@ -121,9 +120,6 @@ export default function CalendarWithReminders() {
   };
 
   const handleEditReminder = async (reminderId: any, reminder: any) => {
-    const userId = user.uid;
-    console.log("Reminder to edit:", userId, reminderId, reminder);
-
     const parsedReminder = {
       ...reminder,
       date:
@@ -151,8 +147,8 @@ export default function CalendarWithReminders() {
 
   const handleDeleteReminder = async (remainderId: any) => {
     const userId = user.uid;
-    // setReminders(reminders.filter((reminder) => reminder.id !== id));
-    console.log("Delete:", userId, remainderId);
+    setIsLoading(true);
+
     try {
       await deleteReminder(userId, remainderId);
       // Decrement the remindersCount in statistics/summary
@@ -161,6 +157,10 @@ export default function CalendarWithReminders() {
         remindersCount: increment(-1),
       });
       console.log("Deleted");
+      setReminders(
+        reminders.filter((reminder: any) => reminder.id !== remainderId)
+      );
+      setIsLoading(false);
     } catch (e: any) {
       console.log("An error occurred: ", e);
     }
@@ -171,19 +171,15 @@ export default function CalendarWithReminders() {
       alert("Please enter a reminder title");
       return;
     }
-
     if (editMode) {
       if (user) {
         setIsLoading(true);
-        console.log("Remainder id:", currentReminder?.id);
         try {
           await updateReminder(user.uid, currentReminder?.id, {
             title: currentReminder.title,
             description: currentReminder.description,
             date: currentReminder.date,
           });
-
-          console.log("Updated");
           setIsLoading(false);
         } catch (e: any) {
           console.log("error occured", e);
@@ -204,6 +200,8 @@ export default function CalendarWithReminders() {
         //   collection(db, "Users", user.uid, "Reminders"),
         //   newReminder
         // );
+        setIsLoading(true);
+
         const docRef = await addDoc(
           collection(db, "Users", user.uid, "Reminders"),
           {
@@ -227,7 +225,7 @@ export default function CalendarWithReminders() {
         };
         setReminders((prev: any) => [...prev, newReminder]);
         console.log("New remainder set:", newReminder);
-
+        setIsLoading(false);
         setShowModal(false);
       } catch (error) {
         console.error("Error saving reminder:", error);
@@ -411,6 +409,7 @@ export default function CalendarWithReminders() {
                       <Edit size={16} />
                     </button>
                     <button
+                      disabled={isLoading}
                       onClick={() => handleDeleteReminder(reminder.id)}
                       className="text-gray-500 hover:text-red-500"
                     >
