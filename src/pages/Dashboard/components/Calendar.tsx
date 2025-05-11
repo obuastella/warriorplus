@@ -9,13 +9,7 @@ import {
   Trash2,
   Plus,
 } from "lucide-react";
-import {
-  addDoc,
-  collection,
-  doc,
-  increment,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, increment, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../../components/firebase";
 import { useReminderStore } from "../../../store/useRemainderStore";
 
@@ -99,27 +93,16 @@ export default function CalendarWithReminders() {
     });
     setEditMode(false);
     setShowModal(true);
-    console.log("Date selected: ", clickedDate);
   };
 
   const hasReminder = (day: any) => {
-    return reminders.some((reminder: any) => {
-      const reminderDate = new Date(reminder.date);
+    return remindersData.some((reminder: any) => {
+      // const reminderDate = new Date(reminder.date);
+      const reminderDate = new Date(reminder.date.seconds * 1000);
       return (
         reminderDate.getDate() === day &&
         reminderDate.getMonth() === displayedMonth &&
         reminderDate.getFullYear() === displayedYear
-      );
-    });
-  };
-
-  const getRemindersForDate = (date: any) => {
-    return reminders.filter((reminder: any) => {
-      const reminderDate = new Date(reminder.date);
-      return (
-        reminderDate.getDate() === date.getDate() &&
-        reminderDate.getMonth() === date.getMonth() &&
-        reminderDate.getFullYear() === date.getFullYear()
       );
     });
   };
