@@ -52,9 +52,6 @@ export default function CalendarWithReminders() {
     if (user) fetchReminders(user.uid);
   }, [user]);
 
-  // const handleDeleteReminder = async (id: string) => {
-  //   if (user) await deleteReminder(user.uid, id);
-  // };
   const getDaysInMonth = (month, year) => {
     return new Date(year, month + 1, 0).getDate();
   };
@@ -85,18 +82,19 @@ export default function CalendarWithReminders() {
     setDisplayedYear(parseInt(e.target.value));
   };
 
-  const handleDateClick = (day) => {
+  const handleDateClick = (day: any) => {
     const clickedDate = new Date(displayedYear, displayedMonth, day);
     setSelectedDate(clickedDate);
-    // Open modal with an empty reminder
+
     setCurrentReminder({
-      id: null,
+      id: "",
       title: "",
       description: "",
       date: clickedDate,
     });
     setEditMode(false);
     setShowModal(true);
+    console.log("Date selected: ", clickedDate);
   };
 
   const hasReminder = (day) => {
@@ -121,14 +119,32 @@ export default function CalendarWithReminders() {
     });
   };
 
-  const handleEditReminder = (reminder) => {
+  const handleEditReminder = (reminder: any) => {
     setCurrentReminder({ ...reminder });
     setEditMode(true);
     setShowModal(true);
+    //
+    const reminderToEdit = reminders.find((r) => r.id === id);
+    if (reminderToEdit) {
+      setCurrentReminder(reminderToEdit);
+    }
   };
 
-  const handleDeleteReminder = (id) => {
-    setReminders(reminders.filter((reminder) => reminder.id !== id));
+  const handleDeleteReminder = async (remainderId: any) => {
+    const userId = user.uid;
+    // setReminders(reminders.filter((reminder) => reminder.id !== id));
+    console.log("Delete:", userId, remainderId);
+    try {
+      await deleteReminder(userId, remainderId);
+      // Decrement the remindersCount in statistics/summary
+      const summaryRef = doc(db, "Users", user.uid, "statistics", "summary");
+      await updateDoc(summaryRef, {
+        remindersCount: increment(-1),
+      });
+      console.log("Deleted");
+    } catch (e: any) {
+      console.log("An error occurred: ", e);
+    }
   };
 
   const handleSaveReminder = async () => {
@@ -276,7 +292,7 @@ export default function CalendarWithReminders() {
   ];
 
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
+  const today = new Date();
   return (
     <div className="w-fit  md:w-full bg-white rounded-lg shadow">
       <div className="grid grid-cols-3">
@@ -332,10 +348,10 @@ export default function CalendarWithReminders() {
           <button
             onClick={() => {
               setCurrentReminder({
-                id: null,
+                id: "",
                 title: "",
                 description: "",
-                date: new Date(),
+                date: today,
               });
               setEditMode(false);
               setShowModal(true);
@@ -359,7 +375,7 @@ export default function CalendarWithReminders() {
                   <div>
                     <p className="font-medium">{reminder.title}</p>
                     <p className="text-sm text-gray-500">
-                      {formatDate(new Date(reminder.createdAt))}
+                      {formatDate(new Date(reminder?.date?.seconds * 1000))}
                     </p>
                     {reminder.description && (
                       <p className="text-sm mt-1">{reminder.description}</p>
@@ -367,7 +383,7 @@ export default function CalendarWithReminders() {
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => handleEditReminder(reminder)}
+                      onClick={() => handleEditReminder(reminder.id)}
                       className="text-gray-500 hover:text-blue-500"
                     >
                       <Edit size={16} />
@@ -408,9 +424,14 @@ export default function CalendarWithReminders() {
                 </label>
                 <div className="flex items-center bg-gray-100 p-2 rounded">
                   <Calendar size={18} className="text-gray-500 mr-2" />
+                  {/* <span>
+                    {currentReminder.date
+                      ? currentReminder?.date
+                      : "Select a date"}
+                  </span> */}
                   <span>
                     {currentReminder.date
-                      ? formatDate(new Date(currentReminder.createdAt))
+                      ? currentReminder.date.toDateString()
                       : "Select a date"}
                   </span>
                 </div>
