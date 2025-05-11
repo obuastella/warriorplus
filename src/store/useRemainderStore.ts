@@ -37,6 +37,7 @@ export const useReminderStore = create<ReminderStore>((set) => ({
   remindersData: [],
 
   fetchReminders: async (userId) => {
+    console.log("Fetching reminders...");
     const q = query(
       collection(db, "Users", userId, "Reminders"),
       orderBy("date", "asc")
@@ -46,8 +47,16 @@ export const useReminderStore = create<ReminderStore>((set) => ({
       id: doc.id,
       ...doc.data(),
     })) as Reminder[];
+
+    // Check for duplicate IDs
+    const ids = data.map((r) => r.id);
+    const duplicates = ids.filter((id, i) => ids.indexOf(id) !== i);
+    if (duplicates.length > 0) {
+      console.warn("Duplicate IDs found:", duplicates);
+    }
+
     set({ remindersData: data });
-    console.log("Remainders: ", data);
+    console.log("Reminders fetched:", data);
   },
 
   addReminder: async (userId, reminder) => {
