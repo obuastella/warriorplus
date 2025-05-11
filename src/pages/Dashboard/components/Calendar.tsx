@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { useState, useEffect } from "react";
 import {
   ChevronLeft,
@@ -12,10 +11,13 @@ import {
 import { doc, increment, updateDoc } from "firebase/firestore";
 import { auth, db } from "../../../components/firebase";
 import { useReminderStore } from "../../../store/useRemainderStore";
+import useUserStatistics from "../../../hooks/useUserStatistics";
 
 export default function CalendarWithReminders() {
+  const { refetchStatistics } = useUserStatistics(false);
+
   const user: any = auth.currentUser;
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<any>(null);
   const [displayedMonth, setDisplayedMonth] = useState(new Date().getMonth());
   const [displayedYear, setDisplayedYear] = useState(new Date().getFullYear());
@@ -144,10 +146,10 @@ export default function CalendarWithReminders() {
       await updateDoc(summaryRef, {
         remindersCount: increment(-1),
       });
-      console.log("Deleted");
       setReminders(
         reminders.filter((reminder: any) => reminder.id !== remainderId)
       );
+      await refetchStatistics();
       setIsLoading(false);
     } catch (e: any) {
       console.log("An error occurred: ", e);
@@ -189,6 +191,8 @@ export default function CalendarWithReminders() {
         await updateDoc(summaryRef, {
           remindersCount: increment(1),
         });
+        await refetchStatistics();
+
         setIsLoading(false);
         setShowModal(false);
       } catch (error) {
@@ -345,23 +349,25 @@ export default function CalendarWithReminders() {
           </button>
         </div>
 
-        <div className="space-y-3 max-h-96 overflow-y-auto">
+        <div className="space-y-3 max-h-60 overflow-y-auto">
           {remindersData.length === 0 ? (
             <p className="text-gray-500 text-center">No reminders set</p>
           ) : (
             remindersData.map((reminder: any) => (
               <div
                 key={reminder.id}
-                className="p-3 border rounded-lg hover:bg-gray-50"
+                className="p-3 border border-foreground rounded-lg hover:bg-gray-50"
               >
                 <div className="flex justify-between items-start">
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="font-medium">{reminder.title}</p>
                     <p className="text-sm text-gray-500">
                       {formatDate(new Date(reminder?.date?.seconds * 1000))}
                     </p>
                     {reminder.description && (
-                      <p className="text-sm mt-1">{reminder.description}</p>
+                      <p className="break-words text-sm mt-1">
+                        {reminder.description}
+                      </p>
                     )}
                   </div>
                   <div className="flex space-x-2">

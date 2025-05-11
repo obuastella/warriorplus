@@ -3,7 +3,8 @@ import useUserStatistics from "../../../hooks/useUserStatistics";
 import { useUserStore } from "../../../store/userStore";
 
 export default function Statistics() {
-  const { statistics } = useUserStore();
+  const statistics = useUserStore((state) => state.statistics);
+
   useUserStatistics();
   const Statistics = [
     {

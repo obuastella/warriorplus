@@ -38,7 +38,6 @@ export const useReminderStore = create<ReminderStore>((set) => ({
   remindersData: [],
 
   fetchReminders: async (userId) => {
-    console.log("Fetching reminders...");
     const q = query(
       collection(db, "Users", userId, "Reminders"),
       orderBy("date", "asc")
