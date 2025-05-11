@@ -16,6 +16,7 @@ interface Reminder {
   title: string;
   description?: string;
   date: string;
+  createdAt: string;
 }
 
 interface ReminderStore {
@@ -62,7 +63,7 @@ export const useReminderStore = create<ReminderStore>((set) => ({
   addReminder: async (userId, reminder) => {
     const ref = collection(db, "Users", userId, "Reminders");
     await addDoc(ref, reminder);
-    await useReminderStore.getState().fetchReminders(userId); // Refresh list
+    await useReminderStore.getState().fetchReminders(userId);
   },
 
   deleteReminder: async (userId, reminderId) => {

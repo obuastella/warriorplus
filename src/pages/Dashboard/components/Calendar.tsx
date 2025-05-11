@@ -22,7 +22,7 @@ import { useReminderStore } from "../../../store/useRemainderStore";
 export default function CalendarWithReminders() {
   const user: any = auth.currentUser;
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState<any>(null);
   const [displayedMonth, setDisplayedMonth] = useState(new Date().getMonth());
   const [displayedYear, setDisplayedYear] = useState(new Date().getFullYear());
   const [availableYears, setAvailableYears] = useState([]);
@@ -45,8 +45,13 @@ export default function CalendarWithReminders() {
     }
     setAvailableYears(years);
   }, []);
-  const { remindersData, fetchReminders, updateReminder, deleteReminder } =
-    useReminderStore();
+  const {
+    remindersData,
+    fetchReminders,
+    addReminder,
+    updateReminder,
+    deleteReminder,
+  } = useReminderStore();
 
   useEffect(() => {
     if (user) fetchReminders(user.uid);
@@ -83,7 +88,7 @@ export default function CalendarWithReminders() {
   };
 
   const handleDateClick = (day: any) => {
-    const clickedDate = new Date(displayedYear, displayedMonth, day);
+    const clickedDate: any = new Date(displayedYear, displayedMonth, day);
     setSelectedDate(clickedDate);
 
     setCurrentReminder({
@@ -98,7 +103,7 @@ export default function CalendarWithReminders() {
   };
 
   const hasReminder = (day: any) => {
-    return reminders.some((reminder) => {
+    return reminders.some((reminder: any) => {
       const reminderDate = new Date(reminder.date);
       return (
         reminderDate.getDate() === day &&
@@ -109,7 +114,7 @@ export default function CalendarWithReminders() {
   };
 
   const getRemindersForDate = (date: any) => {
-    return reminders.filter((reminder) => {
+    return reminders.filter((reminder: any) => {
       const reminderDate = new Date(reminder.date);
       return (
         reminderDate.getDate() === date.getDate() &&
@@ -186,52 +191,27 @@ export default function CalendarWithReminders() {
         }
       }
     } else {
-      // Add new reminder
-      // const newReminder = {
-      //   ...currentReminder,
-      //   createdAt: new Date().toISOString(),
-      //   id: Date.now().toString(),
-      // };
-      // setReminders([...reminders, newReminder]);
-      // added
       try {
-        // Add new reminder to Firestore under user-specific subcollection
-        // await addDoc(
-        //   collection(db, "Users", user.uid, "Reminders"),
-        //   newReminder
-        // );
         setIsLoading(true);
 
-        const docRef = await addDoc(
-          collection(db, "Users", user.uid, "Reminders"),
-          {
-            title: currentReminder.title,
-            description: currentReminder.description,
-            date: currentReminder.date,
-            createdAt: new Date().toISOString(),
-          }
-        );
+        await addReminder(user.uid, {
+          title: currentReminder.title,
+          description: currentReminder.description,
+          date: currentReminder.date,
+          createdAt: new Date().toISOString(),
+        });
+
         // Increment the remindersCount in statistics/summary
         const summaryRef = doc(db, "Users", user.uid, "statistics", "summary");
         await updateDoc(summaryRef, {
           remindersCount: increment(1),
         });
-
-        const newReminder: any = {
-          id: docRef.id,
-          title: currentReminder.title,
-          description: currentReminder.description,
-          date: currentReminder.date,
-        };
-        setReminders((prev: any) => [...prev, newReminder]);
-        console.log("New remainder set:", newReminder);
         setIsLoading(false);
         setShowModal(false);
       } catch (error) {
         console.error("Error saving reminder:", error);
       }
     }
-
     setShowModal(false);
     setCurrentReminder({ id: null, title: "", description: "", date: null });
   };
@@ -254,7 +234,7 @@ export default function CalendarWithReminders() {
         date.getMonth() === currentDate.getMonth() &&
         date.getFullYear() === currentDate.getFullYear();
 
-      const isSelected =
+      const isSelected: any =
         selectedDate &&
         date.getDate() === selectedDate.getDate() &&
         date.getMonth() === selectedDate.getMonth() &&
