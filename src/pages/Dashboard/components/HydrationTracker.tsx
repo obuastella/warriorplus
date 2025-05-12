@@ -2,21 +2,25 @@ import { useState } from "react";
 import { Info, ShieldAlert, Users, Pencil } from "lucide-react";
 import BloodCountModal from "../modals/BloodCountModal";
 import { useNavigate } from "react-router-dom";
+import { useTrackerStore } from "../../../store/trackerStore";
+import useTrackerData from "../../../hooks/useTrackerData";
 
 export default function HydrationTracker({ onBloodCountUpdate }: any) {
+  const { tracker } = useTrackerStore();
+  useTrackerData();
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
-  const tracker = [
+  const Tracker = [
     {
       title: "Community",
       icon: <Info color="white" />,
-      status: "Joined",
+      status: tracker.community,
     },
     {
       title: "Blood Count",
       icon: <Users color="white" />,
-      status: "Recorded",
+      status: tracker.bloodCount.length === 0 ? "None" : "Recorded",
     },
   ];
   const handleEmergency = () => {
@@ -29,7 +33,7 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
   };
 
   return (
-    <div className="w-full md:w-[32%] p-6 rounded-xl mb-8 md:mb-0">
+    <div className="w-full md:w-[35%] p-6 rounded-xl mb-8 md:mb-0">
       <h1 className="font-bold text-xl"> Tracker</h1>
       <div className="mt-6 space-y-4 flex gap-x-4 gap-y-12">
         <div
@@ -43,11 +47,11 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
             className="rounded-lg bg-secondary/80 text-white text-sm px-5 p-2 cursor-pointer"
             onClick={handleEmergency}
           >
-            Alert Contact
+            {tracker.emergencyContact === "None" ? "Set" : "Alert Contacts"}
           </button>
         </div>
       </div>
-      {tracker.map((track, id) => (
+      {Tracker.map((track, id) => (
         <div key={id} className="mt-6 space-y-4 flex gap-x-4 gap-y-12">
           <div
             className={`flex justify-center items-center p-2.5 w-16 h-16 rounded-sm ${
@@ -75,12 +79,12 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
           <Pencil color="white" />
         </div>
         <div>
-          <h2 className="font-semibold text-base">Record Blood Count</h2>
+          <h2 className="font-semibold text-base">Blood Count</h2>
           <button
             className="rounded-lg bg-primary text-white text-sm px-5 p-2 cursor-pointer"
             onClick={() => setShowModal(true)}
           >
-            Record
+            {tracker.bloodCount.length === 0 ? "Record" : "Edit"}
           </button>
         </div>
       </div>

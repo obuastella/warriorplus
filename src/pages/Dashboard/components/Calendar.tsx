@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { useState, useEffect } from "react";
 import {
   ChevronLeft,
@@ -9,38 +8,56 @@ import {
   Trash2,
   Plus,
 } from "lucide-react";
+import { doc, increment, updateDoc } from "firebase/firestore";
+import { auth, db } from "../../../components/firebase";
+import { useReminderStore } from "../../../store/useRemainderStore";
+import useUserStatistics from "../../../hooks/useUserStatistics";
 
 export default function CalendarWithReminders() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(null);
+  const { refetchStatistics } = useUserStatistics(false);
+
+  const user: any = auth.currentUser;
+  const [currentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<any>(null);
   const [displayedMonth, setDisplayedMonth] = useState(new Date().getMonth());
   const [displayedYear, setDisplayedYear] = useState(new Date().getFullYear());
   const [availableYears, setAvailableYears] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [reminders, setReminders] = useState([]);
-  const [currentReminder, setCurrentReminder] = useState({
-    id: null,
+  const [reminders, setReminders] = useState<any>([]);
+  const [currentReminder, setCurrentReminder] = useState<any>({
+    id: "",
     title: "",
     description: "",
-    date: null,
+    date: undefined,
   });
   const [editMode, setEditMode] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   // Generate list of years for the filter (current year ± 5 years)
   useEffect(() => {
     const currentYear = new Date().getFullYear();
-    const years = [];
+    const years: any = [];
     for (let i = currentYear - 5; i <= currentYear + 5; i++) {
       years.push(i);
     }
     setAvailableYears(years);
   }, []);
+  const {
+    remindersData,
+    fetchReminders,
+    addReminder,
+    updateReminder,
+    deleteReminder,
+  } = useReminderStore();
 
-  const getDaysInMonth = (month, year) => {
+  useEffect(() => {
+    if (user) fetchReminders(user.uid);
+  }, [user?.uid]);
+
+  const getDaysInMonth = (month: any, year: any) => {
     return new Date(year, month + 1, 0).getDate();
   };
 
-  const getFirstDayOfMonth = (month, year) => {
+  const getFirstDayOfMonth = (month: any, year: any) => {
     return new Date(year, month, 1).getDay();
   };
 
@@ -62,16 +79,16 @@ export default function CalendarWithReminders() {
     }
   };
 
-  const handleYearChange = (e) => {
+  const handleYearChange = (e: any) => {
     setDisplayedYear(parseInt(e.target.value));
   };
 
-  const handleDateClick = (day) => {
-    const clickedDate = new Date(displayedYear, displayedMonth, day);
+  const handleDateClick = (day: any) => {
+    const clickedDate: any = new Date(displayedYear, displayedMonth, day);
     setSelectedDate(clickedDate);
-    // Open modal with an empty reminder
+
     setCurrentReminder({
-      id: null,
+      id: "",
       title: "",
       description: "",
       date: clickedDate,
@@ -80,9 +97,10 @@ export default function CalendarWithReminders() {
     setShowModal(true);
   };
 
-  const hasReminder = (day) => {
-    return reminders.some((reminder) => {
-      const reminderDate = new Date(reminder.date);
+  const hasReminder = (day: any) => {
+    return remindersData.some((reminder: any) => {
+      // const reminderDate = new Date(reminder.date);
+      const reminderDate = new Date(reminder.date.seconds * 1000);
       return (
         reminderDate.getDate() === day &&
         reminderDate.getMonth() === displayedMonth &&
@@ -91,49 +109,96 @@ export default function CalendarWithReminders() {
     });
   };
 
-  const getRemindersForDate = (date) => {
-    return reminders.filter((reminder) => {
-      const reminderDate = new Date(reminder.date);
-      return (
-        reminderDate.getDate() === date.getDate() &&
-        reminderDate.getMonth() === date.getMonth() &&
-        reminderDate.getFullYear() === date.getFullYear()
-      );
-    });
-  };
+  const handleEditReminder = async (reminderId: any, reminder: any) => {
+    const parsedReminder = {
+      ...reminder,
+      date:
+        reminder.date && typeof reminder.date.toDate === "function"
+          ? reminder.date.toDate()
+          : new Date(reminder.date),
+    };
 
-  const handleEditReminder = (reminder) => {
-    setCurrentReminder({ ...reminder });
+    setCurrentReminder(parsedReminder);
     setEditMode(true);
     setShowModal(true);
+
+    const reminderToEdit: any = reminders.find((r: any) => r.id === reminderId);
+    if (reminderToEdit) {
+      setCurrentReminder({
+        ...reminderToEdit,
+        date:
+          reminderToEdit.date &&
+          typeof reminderToEdit.date.toDate === "function"
+            ? reminderToEdit.date.toDate()
+            : new Date(reminderToEdit.date),
+      });
+    }
   };
 
-  const handleDeleteReminder = (id) => {
-    setReminders(reminders.filter((reminder) => reminder.id !== id));
+  const handleDeleteReminder = async (remainderId: any) => {
+    const userId = user.uid;
+    setIsLoading(true);
+
+    try {
+      await deleteReminder(userId, remainderId);
+      // Decrement the remindersCount in statistics/summary
+      const summaryRef = doc(db, "Users", user.uid, "statistics", "summary");
+      await updateDoc(summaryRef, {
+        remindersCount: increment(-1),
+      });
+      setReminders(
+        reminders.filter((reminder: any) => reminder.id !== remainderId)
+      );
+      await refetchStatistics();
+      setIsLoading(false);
+    } catch (e: any) {
+      console.log("An error occurred: ", e);
+    }
   };
 
-  const handleSaveReminder = () => {
+  const handleSaveReminder = async () => {
     if (!currentReminder.title.trim()) {
       alert("Please enter a reminder title");
       return;
     }
-
     if (editMode) {
-      // Update existing reminder
-      setReminders(
-        reminders.map((reminder) =>
-          reminder.id === currentReminder.id ? currentReminder : reminder
-        )
-      );
+      if (user) {
+        setIsLoading(true);
+        try {
+          await updateReminder(user.uid, currentReminder?.id, {
+            title: currentReminder.title,
+            description: currentReminder.description,
+            date: currentReminder.date,
+          });
+          setIsLoading(false);
+        } catch (e: any) {
+          console.log("error occured", e);
+        }
+      }
     } else {
-      // Add new reminder
-      const newReminder = {
-        ...currentReminder,
-        id: Date.now(), // Simple unique ID
-      };
-      setReminders([...reminders, newReminder]);
-    }
+      try {
+        setIsLoading(true);
 
+        await addReminder(user.uid, {
+          title: currentReminder.title,
+          description: currentReminder.description,
+          date: currentReminder.date,
+          createdAt: new Date().toISOString(),
+        });
+
+        // Increment the remindersCount in statistics/summary
+        const summaryRef = doc(db, "Users", user.uid, "statistics", "summary");
+        await updateDoc(summaryRef, {
+          remindersCount: increment(1),
+        });
+        await refetchStatistics();
+
+        setIsLoading(false);
+        setShowModal(false);
+      } catch (error) {
+        console.error("Error saving reminder:", error);
+      }
+    }
     setShowModal(false);
     setCurrentReminder({ id: null, title: "", description: "", date: null });
   };
@@ -156,7 +221,7 @@ export default function CalendarWithReminders() {
         date.getMonth() === currentDate.getMonth() &&
         date.getFullYear() === currentDate.getFullYear();
 
-      const isSelected =
+      const isSelected: any =
         selectedDate &&
         date.getDate() === selectedDate.getDate() &&
         date.getMonth() === selectedDate.getMonth() &&
@@ -188,7 +253,7 @@ export default function CalendarWithReminders() {
     return days;
   };
 
-  const formatDate = (date) => {
+  const formatDate = (date: any) => {
     const options = {
       weekday: "short",
       day: "numeric",
@@ -214,17 +279,12 @@ export default function CalendarWithReminders() {
   ];
 
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  // Sort reminders by date
-  const sortedReminders = [...reminders].sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
-
+  const today = new Date();
   return (
     <div className="w-fit  md:w-full bg-white rounded-lg shadow">
       <div className="grid grid-cols-3">
         {/* Calendar Section */}
-        <div className="p-4 w-[280px] md:w-md lg:w-2xl">
+        <div className="p-4 w-[280px] md:w-md lg:w-xl xl:w-2xl">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <h2 className="text-lg font-semibold">
@@ -275,10 +335,10 @@ export default function CalendarWithReminders() {
           <button
             onClick={() => {
               setCurrentReminder({
-                id: null,
+                id: "",
                 title: "",
                 description: "",
-                date: new Date(),
+                date: today,
               });
               setEditMode(false);
               setShowModal(true);
@@ -289,33 +349,36 @@ export default function CalendarWithReminders() {
           </button>
         </div>
 
-        <div className="space-y-3 max-h-96 overflow-y-auto">
-          {sortedReminders.length === 0 ? (
+        <div className="space-y-3 max-h-60 overflow-y-auto">
+          {remindersData.length === 0 ? (
             <p className="text-gray-500 text-center">No reminders set</p>
           ) : (
-            sortedReminders.map((reminder) => (
+            remindersData.map((reminder: any) => (
               <div
                 key={reminder.id}
-                className="p-3 border rounded-lg hover:bg-gray-50"
+                className="p-3 border border-foreground rounded-lg hover:bg-gray-50"
               >
                 <div className="flex justify-between items-start">
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="font-medium">{reminder.title}</p>
                     <p className="text-sm text-gray-500">
-                      {formatDate(new Date(reminder.date))}
+                      {formatDate(new Date(reminder?.date?.seconds * 1000))}
                     </p>
                     {reminder.description && (
-                      <p className="text-sm mt-1">{reminder.description}</p>
+                      <p className="break-words text-sm mt-1">
+                        {reminder.description}
+                      </p>
                     )}
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => handleEditReminder(reminder)}
+                      onClick={() => handleEditReminder(reminder.id, reminder)}
                       className="text-gray-500 hover:text-blue-500"
                     >
                       <Edit size={16} />
                     </button>
                     <button
+                      disabled={isLoading}
                       onClick={() => handleDeleteReminder(reminder.id)}
                       className="text-gray-500 hover:text-red-500"
                     >
@@ -353,7 +416,7 @@ export default function CalendarWithReminders() {
                   <Calendar size={18} className="text-gray-500 mr-2" />
                   <span>
                     {currentReminder.date
-                      ? formatDate(new Date(currentReminder.date))
+                      ? currentReminder.date.toDateString()
                       : "Select a date"}
                   </span>
                 </div>
@@ -403,9 +466,10 @@ export default function CalendarWithReminders() {
                 </button>
                 <button
                   onClick={handleSaveReminder}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  disabled={isLoading}
+                  className=" disabled:bg-gray-300 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
-                  Save
+                  {isLoading ? "Loading..." : "Save"}
                 </button>
               </div>
             </div>

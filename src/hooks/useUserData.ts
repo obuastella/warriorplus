@@ -5,7 +5,7 @@ import { db } from "../components/firebase";
 import { useUserStore } from "../store/userStore";
 
 const useUserData = () => {
-  const { setUser } = useUserStore();
+  const { setUser }: any = useUserStore();
 
   useEffect(() => {
     const fetchUserData = async () => {

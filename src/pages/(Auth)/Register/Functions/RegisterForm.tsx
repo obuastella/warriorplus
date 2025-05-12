@@ -10,6 +10,7 @@ import { setDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../../config/Config";
+import { useUserStore } from "../../../../store/userStore";
 export default function RegisterForm() {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
@@ -63,7 +64,22 @@ export default function RegisterForm() {
           lastName: lastName,
           isVerified: false,
         });
+        await setDoc(doc(db, "Users", user.uid, "statistics", "summary"), {
+          painJournalEntries: 0,
+          remindersCount: 0,
+          painCrisisLevel: "None",
+        });
+        await setDoc(doc(db, "Users", user.uid, "tracker", "data"), {
+          emergencyContact: "None",
+          community: "None",
+          bloodCount: [],
+        });
       }
+      useUserStore.getState().setStatistics({
+        painJournalEntries: 0,
+        remindersCount: 0,
+        painCrisisLevel: "None",
+      });
 
       toast.success("Verification email sent! Please check your inbox.", {
         position: "top-right",
