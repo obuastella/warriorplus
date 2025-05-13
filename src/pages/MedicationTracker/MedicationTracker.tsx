@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { useState, useEffect } from "react";
 import {
   PlusCircle,
@@ -9,31 +8,19 @@ import {
   Calendar,
 } from "lucide-react";
 import { toast } from "react-toastify";
-
-// This would come from your database in a real app
-const INITIAL_MEDICATIONS = [
-  {
-    id: 1,
-    name: "Hydroxyurea",
-    frequency: "Daily",
-    dosage: "500mg",
-    effectiveness: 4,
-    sideEffects: "Mild nausea",
-    notes: "Works well for pain prevention",
-  },
-  {
-    id: 2,
-    name: "Ibuprofen",
-    frequency: "As needed",
-    dosage: "400mg",
-    effectiveness: 3,
-    sideEffects: "None",
-    notes: "Good for mild pain",
-  },
-];
+import Summary from "./components/Summary";
+import { auth, db } from "../../components/firebase";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 
 export default function MedicationTracker() {
-  const [medications, setMedications] = useState(INITIAL_MEDICATIONS);
+  const [medications, setMedications] = useState<any>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newMedication, setNewMedication] = useState({
     name: "",
@@ -46,22 +33,28 @@ export default function MedicationTracker() {
   const [editingId, setEditingId] = useState(null);
   const [filterOption, setFilterOption] = useState("all");
   const [showEffectivenessGuide, setShowEffectivenessGuide] = useState(false);
-
-  // For tracking the most effective medication
-  const [mostEffectiveMed, setMostEffectiveMed] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Find most effective medication when medications change
-    if (medications.length > 0) {
-      const mostEffective: any = [...medications].sort(
-        (a, b) => b.effectiveness - a.effectiveness
-      )[0];
-      setMostEffectiveMed(mostEffective);
-    } else {
-      setMostEffectiveMed(null);
-    }
-  }, [medications]);
+    const fetchMedications = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
 
+      try {
+        const medsRef = collection(db, "Users", user.uid, "medications");
+        const snapshot = await getDocs(medsRef);
+        const data: any = snapshot.docs.map((doc: any) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setMedications(data);
+      } catch (err) {
+        console.error("Error fetching medications:", err);
+      }
+    };
+
+    fetchMedications();
+  }, []);
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setNewMedication((prev) => ({ ...prev, [name]: value }));
@@ -71,40 +64,72 @@ export default function MedicationTracker() {
     setNewMedication((prev) => ({ ...prev, effectiveness: rating }));
   };
 
-  const handleAddMedication = () => {
-    if (
-      !newMedication.name ||
-      !newMedication.frequency ||
-      !newMedication.dosage
-    ) {
+  const handleAddMedication = async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      toast.error("User not authenticated.");
+      return;
+    }
+
+    const { name, frequency, dosage } = newMedication;
+
+    if (!name || !frequency || !dosage) {
       toast.warning("Please fill in required fields");
       return;
     }
 
-    if (editingId) {
-      // Update existing medication
-      setMedications(
-        medications.map((med) =>
-          med.id === editingId ? { ...newMedication, id: editingId } : med
-        )
-      );
-      setEditingId(null);
-    } else {
-      // Add new medication
-      const newId = Math.max(0, ...medications.map((m) => m.id)) + 1;
-      setMedications([...medications, { ...newMedication, id: newId }]);
-    }
+    const medicationsRef = collection(db, "Users", user.uid, "medications");
 
-    // Reset form
-    setNewMedication({
-      name: "",
-      frequency: "",
-      dosage: "",
-      effectiveness: 0,
-      sideEffects: "",
-      notes: "",
-    });
-    setShowAddForm(false);
+    try {
+      if (editingId) {
+        setIsLoading(true);
+
+        // Find the doc ID in Firestore if editing (assumes you've stored it)
+        const medDocRef = doc(medicationsRef, editingId);
+        await updateDoc(medDocRef, newMedication);
+
+        // Update local state
+        setMedications((prev: any) =>
+          prev.map((med: any) =>
+            med.id === editingId ? { ...newMedication, id: editingId } : med
+          )
+        );
+        toast.success("Medication updated!");
+        setIsLoading(false);
+
+        setEditingId(null);
+      } else {
+        setIsLoading(true);
+        // Add new medication to Firestore
+
+        const docRef = await addDoc(medicationsRef, newMedication);
+
+        // Update local state with Firestore-generated ID
+        setMedications((prev: any) => [
+          ...prev,
+          { ...newMedication, id: docRef.id },
+        ]);
+        toast.success("Medication added!");
+        setIsLoading(false);
+      }
+
+      // Reset form
+      setNewMedication({
+        name: "",
+        frequency: "",
+        dosage: "",
+        effectiveness: 0,
+        sideEffects: "",
+        notes: "",
+      });
+      setShowAddForm(false);
+    } catch (error) {
+      console.error("Error saving medication:", error);
+      toast.error("Something went wrong.");
+      setIsLoading(false);
+    }
+    setIsLoading(false);
   };
 
   const handleEditMedication = (med: any) => {
@@ -113,25 +138,41 @@ export default function MedicationTracker() {
     setShowAddForm(true);
   };
 
-  const handleDeleteMedication = (id: any) => {
-    if (confirm("Are you sure you want to remove this medication?")) {
-      setMedications(medications.filter((med) => med.id !== id));
-    }
-  };
+  const handleDeleteMedication = async (id: string) => {
+    setIsLoading(true);
 
+    if (!confirm("Are you sure you want to remove this medication?")) return;
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const medRef = doc(db, "Users", user.uid, "medications", id);
+      await deleteDoc(medRef);
+
+      // Update local state after successful deletion
+      setMedications((prev: any) => prev.filter((med: any) => med.id !== id));
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to delete medication:", error);
+      alert("An error occurred while deleting the medication.");
+      setIsLoading(false);
+    }
+    setIsLoading(false);
+  };
   // Filter medications based on selected option
   const filteredMedications = () => {
     switch (filterOption) {
       case "effective":
-        return medications.filter((med) => med.effectiveness >= 4);
+        return medications.filter((med: any) => med.effectiveness >= 4);
       case "ineffective":
-        return medications.filter((med) => med.effectiveness <= 2);
+        return medications.filter((med: any) => med.effectiveness <= 2);
       case "daily":
-        return medications.filter((med) =>
+        return medications.filter((med: any) =>
           med.frequency.toLowerCase().includes("daily")
         );
       case "asneeded":
-        return medications.filter((med) =>
+        return medications.filter((med: any) =>
           med.frequency.toLowerCase().includes("as needed")
         );
       default:
@@ -150,36 +191,7 @@ export default function MedicationTracker() {
         </p>
       </div>
       {/* Summary Section */}
-      <div className=" mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 rounded-lg border border-foreground">
-            <div className="text-sm text-gray-500">Total Medications</div>
-            <div className="text-2xl font-bold text-gray-900">
-              {medications.length}
-            </div>
-          </div>
-          <div className=" p-4 rounded-lg border border-foreground">
-            <div className="text-sm text-gray-500">Daily Medications</div>
-            <div className="text-2xl font-bold text-gray-900">
-              {
-                medications.filter((med) =>
-                  med.frequency.toLowerCase().includes("daily")
-                ).length
-              }
-            </div>
-          </div>
-          <div className=" p-4 rounded-lg border border-foreground">
-            <div className="text-sm text-gray-500">As-Needed Medications</div>
-            <div className="text-2xl font-bold text-gray-900">
-              {
-                medications.filter((med) =>
-                  med.frequency.toLowerCase().includes("as needed")
-                ).length
-              }
-            </div>
-          </div>
-        </div>
-      </div>
+      <Summary medications={medications} />
 
       {/* Controls */}
       <div className="flex flex-wrap gap-y-4 justify-between items-center mb-4">
@@ -365,6 +377,7 @@ export default function MedicationTracker() {
               Cancel
             </button>
             <button
+              disabled={isLoading}
               type="button"
               onClick={handleAddMedication}
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-400 hover:bg-purple-700"
@@ -385,7 +398,7 @@ export default function MedicationTracker() {
         </div>
       ) : (
         <div className="mb-20 md:mb-0 grid grid-cols-1 gap-4">
-          {filteredMedications().map((med) => (
+          {filteredMedications().map((med: any) => (
             <div
               key={med.id}
               className="border border-foreground rounded-lg p-4 bg-white shadow-sm hover:shadow transition"
@@ -411,6 +424,7 @@ export default function MedicationTracker() {
                     Edit
                   </button>
                   <button
+                    disabled={isLoading}
                     onClick={() => handleDeleteMedication(med.id)}
                     className="text-red-600 hover:text-red-800"
                     aria-label="Delete medication"
