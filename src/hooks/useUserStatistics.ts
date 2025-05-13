@@ -1,6 +1,14 @@
 import { useEffect } from "react";
 import { auth } from "../components/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 import { db } from "../components/firebase";
 import { useUserStore } from "../store/userStore";
 
@@ -10,14 +18,38 @@ const useUserStatistics = (autoFetch = true) => {
   const fetchStatistics = async () => {
     const user = auth.currentUser;
     if (user) {
+      // Get the summary statistics
       const statsRef = doc(db, "Users", user.uid, "statistics", "summary");
       const statsDoc = await getDoc(statsRef);
 
+      // Fetch the latest journal entry
+      let latestSeverity = "N/A";
+      const painJournalRef = collection(db, "Users", user.uid, "painJournal");
+      const latestEntryQuery = query(
+        painJournalRef,
+        orderBy("date", "desc"),
+        limit(1)
+      );
+      const latestEntrySnapshot = await getDocs(latestEntryQuery);
+
+      if (!latestEntrySnapshot.empty) {
+        const latestEntryData = latestEntrySnapshot.docs[0].data();
+        latestSeverity = latestEntryData.severity || "N/A";
+      }
+
       if (statsDoc.exists()) {
         const statisticsData = statsDoc.data();
-        setStatistics(statisticsData);
+        setStatistics({
+          ...statisticsData,
+          painCrisisLevel: latestSeverity, // Inject the latest severity
+        });
       } else {
-        console.log("No statistics found for this user.");
+        // If no stats doc, still set pain crisis severity
+        setStatistics({
+          painJournalEntries: 0,
+          remindersCount: 0,
+          painCrisisLevel: latestSeverity,
+        });
       }
     }
   };

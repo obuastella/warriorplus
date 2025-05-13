@@ -69,6 +69,7 @@ export default function Journal() {
         toast.success("Entry updated");
         setIsLoading(false);
         setEditingEntry(null);
+        await refetchStatistics();
       } else {
         await addDoc(journalRef, form);
         toast.success("Entry added");
