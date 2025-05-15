@@ -56,7 +56,6 @@ export const useReminderStore = create<ReminderStore>((set) => ({
     }
 
     set({ remindersData: data });
-    console.log("Reminders fetched:", data);
   },
 
   addReminder: async (userId, reminder) => {

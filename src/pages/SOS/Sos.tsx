@@ -13,10 +13,8 @@ export default function Sos() {
   useEffect(() => {
     if (tracker?.emergencyContact === "None") {
       setEmergencyContact(false);
-      console.log("No emergency contact set");
     } else {
       setEmergencyContact(true);
-      console.log("Emergency contact set!");
     }
   }, [tracker?.emergencyContact]);
 
