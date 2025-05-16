@@ -10,7 +10,7 @@ const BloodCount = forwardRef((props, ref) => {
   const [bloodMetrics, setBloodMetrics] = useState<any[]>([]);
 
   useEffect(() => {
-    if (tracker.bloodCount.length === 0) {
+    if (!tracker?.bloodCount || tracker.bloodCount.length === 0) {
       setBloodMetrics([]);
     } else {
       // Use real tracker data if available, or dummy for now

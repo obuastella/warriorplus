@@ -1,11 +1,23 @@
 import { Bell } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EmergencyConfirm from "./modals/EmergencyConfirm";
 import { toast } from "react-toastify";
 import NoContact from "./NoContact";
+import useTrackerData from "../../hooks/useTrackerData";
+import { useTrackerStore } from "../../store/trackerStore";
 
 export default function Sos() {
-  const [emergencyContact] = useState(true); // this will base on if the user has emergency contacts registered
+  const { tracker } = useTrackerStore();
+  useTrackerData();
+  const [emergencyContact, setEmergencyContact] = useState<boolean>(false);
+  useEffect(() => {
+    if (tracker?.emergencyContact === "None") {
+      setEmergencyContact(false);
+    } else {
+      setEmergencyContact(true);
+    }
+  }, [tracker?.emergencyContact]);
+
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 

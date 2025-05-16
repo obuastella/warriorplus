@@ -13,11 +13,15 @@ const useTrackerData = () => {
         const trackerRef = doc(db, "Users", user.uid, "tracker", "data");
         const trackerSnap = await getDoc(trackerRef);
         if (trackerSnap.exists()) {
-          setTracker(trackerSnap.data() as any);
+          const data = trackerSnap.data();
+          setTracker({
+            emergencyContact: data.emergencyContact || "",
+            community: data.community || "",
+            bloodCount: Array.isArray(data.bloodCount) ? data.bloodCount : [],
+          });
         }
       }
     };
-
     fetchTracker();
   }, [setTracker]);
 
