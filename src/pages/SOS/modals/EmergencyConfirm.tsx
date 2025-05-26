@@ -1,5 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader } from "lucide-react";
+import { auth, db } from "../../../components/firebase";
+import { collection, getDocs } from "firebase/firestore";
+import { useEffect, useState } from "react";
 
 export default function EmergencyConfirm({
   isOpen,
@@ -7,6 +10,31 @@ export default function EmergencyConfirm({
   isLoading,
   onConfirm,
 }: any) {
+  const [emergencyContacts, setEmergencyContacts] = useState<any[]>([]);
+
+  const fetchUserData = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      const colRef = collection(db, "Users", user.uid, "EmergencyContacts");
+      const querySnapshot = await getDocs(colRef);
+
+      const contacts = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setEmergencyContacts(contacts);
+      console.log("Emergency contacts: ", contacts);
+    } else {
+      console.log("No user is signed in.");
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+  console.log("Emergency contacts: ", emergencyContacts);
+
   return (
     <>
       {isOpen && (
