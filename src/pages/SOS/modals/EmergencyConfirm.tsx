@@ -24,7 +24,7 @@ export default function EmergencyConfirm({
       }));
 
       setEmergencyContacts(contacts);
-      console.log("Emergency contacts: ", contacts);
+      // console.log("Emergency contacts: ", contacts);
     } else {
       console.log("No user is signed in.");
     }
@@ -63,7 +63,7 @@ export default function EmergencyConfirm({
                   Cancel
                 </button>
                 <button
-                  onClick={onConfirm}
+                  onClick={() => onConfirm(emergencyContacts)}
                   className="text-xs md:text-base cursor-pointer px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
                 >
                   {isLoading ? (

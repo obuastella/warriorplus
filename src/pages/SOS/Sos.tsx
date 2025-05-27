@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import NoContact from "./NoContact";
 import useTrackerData from "../../hooks/useTrackerData";
 import { useTrackerStore } from "../../store/trackerStore";
+import emailjs from "emailjs-com";
+// import { sendSms } from "../../utils/sendSms";
 
 export default function Sos() {
   const { tracker } = useTrackerStore();
@@ -21,18 +23,90 @@ export default function Sos() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleConfirmEmergency = async () => {
+  // const handleConfirmEmergency = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     await new Promise((resolve) => setTimeout(resolve, 2000));
+  //     toast.success("An email has been sent to your contacts");
+  //   } catch (e: any) {
+  //     console.log("An error occured");
+  //   } finally {
+  //     setIsLoading(false);
+  //     setShowConfirmationModal(false);
+  //   }
+  // };
+  // added
+  const sendEmergencyEmail = (
+    to_email: string,
+    fullName: string,
+    locationUrl: string
+  ) => {
+    emailjs
+      .send(
+        "service_cr4n2q6", // Your EmailJS Service ID
+        "template_g5gy2qs", // Your EmailJS Template ID for emergency
+        {
+          to_email, // recipient's email
+          full_name: fullName, // recipient's name
+          location_url: locationUrl, // the Google Maps link with coordinates
+        },
+        "4xPiL1wQeLNDbAqoI" // Your EmailJS public key
+      )
+      .then(
+        (response) => {
+          console.log("Emergency email sent:", response.status, response.text);
+        },
+        (error) => {
+          console.error("Error sending emergency email:", error);
+        }
+      );
+  };
+
+  const handleConfirmEmergency = async (
+    contacts: { email: string; fullName: string; phone: string }[]
+  ) => {
     setIsLoading(true);
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      toast.success("An email has been sent to your contacts");
-    } catch (e: any) {
-      console.log("An error occured");
+      // Get user location from browser
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject)
+      );
+
+      const { latitude, longitude } = position.coords;
+      const locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+      // Send email to each emergency contact
+      await Promise.all(
+        contacts.map((contact) =>
+          sendEmergencyEmail(contact.email, contact.fullName, locationUrl)
+        )
+      );
+      // this includes the email  *sms* feature --make sure you have your backend running
+      // await Promise.all([
+      //   ...contacts.map((contact) =>
+      //     sendEmergencyEmail(contact.email, contact.fullName, locationUrl)
+      //   ),
+      //   ...contacts.map((contact) =>
+      //     sendSms(
+      //       contact.phone,
+      //       `Emergency Alert from Warrior+:\nYour loved one may be in crisis.\nLocation: ${locationUrl}`
+      //     )
+      //   ),
+      // ]);
+
+      // end added
+      toast.success("Emergency emails sent to your contacts!");
+    } catch (error) {
+      console.error("Failed to send emergency emails", error);
+      toast.error("Failed to send emergency emails.");
     } finally {
       setIsLoading(false);
       setShowConfirmationModal(false);
     }
   };
+
   return (
     <>
       {emergencyContact ? (
