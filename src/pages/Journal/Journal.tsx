@@ -78,6 +78,10 @@ export default function Journal() {
         await updateDoc(summaryRef, {
           painJournalEntries: increment(1),
         });
+        const adminStats = doc(db, "Admin", "stats");
+        await updateDoc(adminStats, {
+          crisisEvents: increment(1),
+        });
         await refetchStatistics();
         setIsLoading(false);
       }
@@ -117,6 +121,10 @@ export default function Journal() {
         painJournalEntries: increment(-1),
       });
       await refetchStatistics();
+      const adminStats = doc(db, "Admin", "stats");
+      await updateDoc(adminStats, {
+        crisisEvents: increment(-1),
+      });
     } catch (error) {
       toast.error("Failed to delete entry");
     }

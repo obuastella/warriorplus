@@ -6,7 +6,7 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import { auth, db } from "../../../../components/firebase";
-import { setDoc, doc } from "firebase/firestore";
+import { setDoc, doc, increment, updateDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../../config/Config";
@@ -63,6 +63,11 @@ export default function RegisterForm() {
           firstName: firstName,
           lastName: lastName,
           isVerified: false,
+          role: "user",
+        });
+        const adminStats = doc(db, "Admin", "stats");
+        await updateDoc(adminStats, {
+          totalMembers: increment(1),
         });
         await setDoc(doc(db, "Users", user.uid, "statistics", "summary"), {
           painJournalEntries: 0,

@@ -16,6 +16,7 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  increment,
   updateDoc,
 } from "firebase/firestore";
 
@@ -111,6 +112,11 @@ export default function MedicationTracker() {
           { ...newMedication, id: docRef.id },
         ]);
         toast.success("Medication added!");
+        // update admin
+        const adminStats = doc(db, "Admin", "stats");
+        await updateDoc(adminStats, {
+          medicationsRecorded: increment(1),
+        });
         setIsLoading(false);
       }
 
@@ -153,6 +159,11 @@ export default function MedicationTracker() {
       // Update local state after successful deletion
       setMedications((prev: any) => prev.filter((med: any) => med.id !== id));
       setIsLoading(false);
+      // update admin
+      const adminStats = doc(db, "Admin", "stats");
+      await updateDoc(adminStats, {
+        medicationsRecorded: increment(-1),
+      });
     } catch (error) {
       console.error("Failed to delete medication:", error);
       alert("An error occurred while deleting the medication.");
