@@ -94,6 +94,7 @@ export default function UpdateProfile() {
               type="text"
               value={formData.firstName}
               onChange={handleChange}
+              required
             />
           </div>
           <div>
@@ -106,6 +107,7 @@ export default function UpdateProfile() {
               type="text"
               value={formData.lastName}
               onChange={handleChange}
+              required
             />
           </div>
         </div>

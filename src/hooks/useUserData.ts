@@ -1,15 +1,14 @@
-import { useEffect } from "react";
-import { auth } from "../components/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../components/firebase";
+import { useEffect } from "react";
+import { auth, db } from "../components/firebase";
 import { useUserStore } from "../store/userStore";
 
 const useUserData = () => {
-  const { setUser }: any = useUserStore();
+  const { setUser } = useUserStore();
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const user = auth.currentUser;
+      const user: any = auth.currentUser;
       if (user) {
         const userRef = doc(db, "Users", user.uid);
         const docSnap = await getDoc(userRef);
@@ -19,6 +18,7 @@ const useUserData = () => {
             firstName: userData.firstName,
             lastName: userData.lastName,
             email: user.email,
+            role: userData.role,
           });
         }
       }
@@ -29,5 +29,4 @@ const useUserData = () => {
 
   return;
 };
-
 export default useUserData;
