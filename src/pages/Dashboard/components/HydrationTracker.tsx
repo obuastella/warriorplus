@@ -15,7 +15,7 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
     {
       title: "Community",
       icon: <Info color="white" />,
-      status: tracker.community,
+      status: tracker.community == null ? "None" : tracker.community,
     },
     {
       title: "Blood Count",

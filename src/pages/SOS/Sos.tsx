@@ -23,19 +23,6 @@ export default function Sos() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // const handleConfirmEmergency = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     await new Promise((resolve) => setTimeout(resolve, 2000));
-  //     toast.success("An email has been sent to your contacts");
-  //   } catch (e: any) {
-  //     console.log("An error occured");
-  //   } finally {
-  //     setIsLoading(false);
-  //     setShowConfirmationModal(false);
-  //   }
-  // };
-  // added
   const sendEmergencyEmail = (
     to_email: string,
     fullName: string,
@@ -97,7 +84,7 @@ export default function Sos() {
       // ]);
 
       // end added
-      toast.success("Emergency emails sent to your contacts!");
+      toast.success("We have notified your emergency contact!");
     } catch (error) {
       console.error("Failed to send emergency emails", error);
       toast.error("Failed to send emergency emails.");

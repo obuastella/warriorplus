@@ -6,7 +6,12 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import { auth, db } from "../../../../components/firebase";
-import { setDoc, doc, increment, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  increment,
+  serverTimestamp,
+  writeBatch,
+} from "firebase/firestore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../../config/Config";
@@ -43,43 +48,83 @@ export default function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+
     const validationError = validatePassword(password, confirmPassword);
     if (validationError) {
       setError(validationError);
+      setIsLoading(false);
       return;
     }
+
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      setIsLoading(false);
-      const user = auth.currentUser;
-      if (user) {
-        const actionCodeSettings = {
-          url: `${BASE_URL}/login`,
-          handleCodeInApp: true,
-        };
-        await sendEmailVerification(user, actionCodeSettings);
-        setDoc(doc(db, "Users", user.uid), {
-          email: user.email,
-          firstName: firstName,
-          lastName: lastName,
-          isVerified: false,
-          role: "user",
-        });
-        const adminStats = doc(db, "Admin", "stats");
-        await updateDoc(adminStats, {
-          totalMembers: increment(1),
-        });
-        await setDoc(doc(db, "Users", user.uid, "statistics", "summary"), {
-          painJournalEntries: 0,
-          remindersCount: 0,
-          painCrisisLevel: "None",
-        });
-        await setDoc(doc(db, "Users", user.uid, "tracker", "data"), {
-          emergencyContact: "None",
-          community: "None",
-          bloodCount: [],
-        });
-      }
+      // Create the user account
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Send email verification first (doesn't require Firestore write)
+      const actionCodeSettings = {
+        url: `${BASE_URL}/login`,
+        handleCodeInApp: true,
+      };
+      await sendEmailVerification(user, actionCodeSettings);
+
+      // Wait for auth state to be ready (important!)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Alternative: Wait for auth state change
+      // await new Promise((resolve) => {
+      //   const unsubscribe = onAuthStateChanged(auth, (user) => {
+      //     if (user) {
+      //       unsubscribe();
+      //       resolve(user);
+      //     }
+      //   });
+      // });
+
+      // Now perform Firestore operations
+      const batch = writeBatch(db);
+
+      // User document
+      const userDocRef = doc(db, "Users", user.uid);
+      batch.set(userDocRef, {
+        email: user.email,
+        firstName: firstName,
+        lastName: lastName,
+        isVerified: false,
+        role: "user",
+        createdAt: serverTimestamp(),
+      });
+
+      // User statistics subcollection
+      const statsRef = doc(db, "Users", user.uid, "statistics", "summary");
+      batch.set(statsRef, {
+        painJournalEntries: 0,
+        remindersCount: 0,
+        painCrisisLevel: "None",
+      });
+
+      // User tracker subcollection
+      const trackerRef = doc(db, "Users", user.uid, "tracker", "data");
+      batch.set(trackerRef, {
+        emergencyContact: "None",
+        community: "None",
+        bloodCount: [],
+      });
+
+      // Admin stats update
+      const adminStatsRef = doc(db, "Admin", "stats");
+      batch.update(adminStatsRef, {
+        totalMembers: increment(1),
+      });
+
+      // Execute all operations as a batch
+      await batch.commit();
+
+      // Update local state
       useUserStore.getState().setStatistics({
         painJournalEntries: 0,
         remindersCount: 0,
@@ -89,18 +134,25 @@ export default function RegisterForm() {
       toast.success("Verification email sent! Please check your inbox.", {
         position: "top-right",
       });
+
       navigate("/verify-email");
     } catch (error: any) {
-      console.log(error.message);
-      if (error.message === "Firebase: Error (auth/email-already-in-use).") {
+      console.error("Registration error:", error);
+
+      if (error.code === "auth/email-already-in-use") {
         toast.error("Email already in use", {
           position: "top-right",
         });
+      } else if (error.code === "permission-denied") {
+        toast.error("Registration failed. Please try again.", {
+          position: "top-right",
+        });
       } else {
-        toast.error("An error occured", {
+        toast.error("An error occurred during registration", {
           position: "top-right",
         });
       }
+    } finally {
       setIsLoading(false);
     }
   };

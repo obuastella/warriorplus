@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { auth, db } from "../../../../components/firebase";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function LoginForm() {
   const [email, setEmail] = useState<string>("");
@@ -24,26 +24,29 @@ export default function LoginForm() {
         password
       );
       const user = userCredential.user;
-      if (!user.emailVerified) {
-        toast.error("Please verify your email before logging in.");
-        return;
-      }
-      console.log("User logged in succesfully!");
-      toast.success("User logged in successfully");
-      navigate("/dashboard");
-      setIsLoading(false);
-      if (user.emailVerified) {
-        await updateDoc(doc(db, "Users", user.uid), {
-          isVerified: true,
-        });
+
+      // Get user data from Firestore to check role
+      const userDoc = await getDoc(doc(db, "Users", user.uid));
+      const userData = userDoc.data();
+
+      // Skip email verification check for admin users
+      if (userData?.role === "admin" || user.emailVerified) {
+        // User is admin or email is verified - proceed with login
+        navigate("/dashboard");
+      } else {
+        // Regular user with unverified email
+        await auth.signOut();
+        toast.error("Please verify your email before logging in");
       }
     } catch (error: any) {
+      console.log("An error occured:", error);
       if (error.message === "Firebase: Error (auth/invalid-credential).") {
         toast.error("Invalid email or Password", {
           position: "top-right",
         });
       } else {
         toast.error(error.message);
+        setIsLoading(false);
       }
       setIsLoading(false);
     }
