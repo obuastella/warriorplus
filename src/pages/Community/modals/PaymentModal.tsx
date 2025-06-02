@@ -30,9 +30,9 @@ export default function PaymentModal({
       price: 499900, // Price in kobo (₦4,999.00)
       priceDisplay: "₦4,999/year",
       features: [
-        "Access to basic Community",
+        "Access to Private Community",
         "Chat with members",
-        "Weekly health tips",
+        "Weekly health tips sent to your email",
       ],
       color: "bg-blue-500",
     },
@@ -44,9 +44,8 @@ export default function PaymentModal({
       priceDisplay: "₦8,999/year",
       features: [
         "All Basic features",
-        "Access to premium Community",
         "1-on-1 expert consultations",
-        "Personalized meal plans",
+        "Personalized meal plans sent to your email",
       ],
       color: "bg-purple-500",
       popular: true,
@@ -60,7 +59,6 @@ export default function PaymentModal({
       features: [
         "All Premium features",
         "Priority support",
-        "Exclusive VIP Community",
         "Monthly health assessments",
       ],
       color: "bg-yellow-500",
