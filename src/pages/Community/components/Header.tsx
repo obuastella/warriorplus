@@ -1,7 +1,11 @@
 import { useState } from "react";
 import CreateCommunity from "../modals/CreateCommunity";
+import { useUserStore } from "../../../store/userStore";
+import useUserData from "../../../hooks/useUserData";
 
 export default function Header() {
+  const { role } = useUserStore();
+  useUserData();
   const [isOpen, setIsOpen] = useState(false);
 
   const openModal = () => setIsOpen(true);
@@ -18,12 +22,14 @@ export default function Header() {
           </select>
         </div> */}
         <div>
-          <button
-            onClick={openModal}
-            className=" cursor-pointer bg-purple-500 rounded-xl p-2 px-5 text-white"
-          >
-            Create +
-          </button>
+          {role === "admin" && (
+            <button
+              onClick={openModal}
+              className=" cursor-pointer bg-purple-500 rounded-xl p-2 px-5 text-white"
+            >
+              Create +
+            </button>
+          )}
         </div>
       </div>
 
