@@ -112,7 +112,7 @@ export default function RegisterForm() {
       batch.set(trackerRef, {
         emergencyContact: "None",
         community: "None",
-        bloodCount: [],
+        bloodCount: "None",
       });
 
       // Admin stats update

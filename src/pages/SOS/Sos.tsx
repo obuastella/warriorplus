@@ -13,7 +13,10 @@ export default function Sos() {
   useTrackerData();
   const [emergencyContact, setEmergencyContact] = useState<boolean>(false);
   useEffect(() => {
-    if (tracker?.emergencyContact === "None") {
+    if (
+      tracker?.emergencyContact === "None" ||
+      tracker?.emergencyContact === ""
+    ) {
       setEmergencyContact(false);
     } else {
       setEmergencyContact(true);

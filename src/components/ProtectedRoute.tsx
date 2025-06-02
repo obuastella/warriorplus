@@ -54,11 +54,17 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  // Check if user exists and either is admin or has verified email
-  if (!user || (role !== "admin" && !user.emailVerified)) {
+  // Check if user exists and either is admin or user2 or  has verified email
+  if (
+    !user ||
+    !(
+      role === "admin" ||
+      role === "user2" ||
+      (role === "user" && user.emailVerified)
+    )
+  ) {
     return <Navigate to="/login" replace />;
   }
-
   return <>{children}</>;
 };
 export default ProtectedRoute;

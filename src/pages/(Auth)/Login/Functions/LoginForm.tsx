@@ -29,9 +29,12 @@ export default function LoginForm() {
       const userDoc = await getDoc(doc(db, "Users", user.uid));
       const userData = userDoc.data();
 
-      // Skip email verification check for admin users
-      if (userData?.role === "admin" || user.emailVerified) {
-        // User is admin or email is verified - proceed with login
+      // Skip email verification check for admin and invoked admin users
+      if (
+        userData?.role === "admin" ||
+        userData?.role === "user2" ||
+        (userData?.role === "user" && user.emailVerified)
+      ) {
         navigate("/dashboard");
       } else {
         // Regular user with unverified email

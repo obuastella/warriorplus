@@ -3,7 +3,7 @@ import { create } from "zustand";
 interface Tracker {
   emergencyContact: string;
   community: string;
-  bloodCount: any[];
+  bloodCount: any;
 }
 
 interface TrackerStore {
@@ -15,7 +15,7 @@ export const useTrackerStore = create<TrackerStore>((set) => ({
   tracker: {
     emergencyContact: "",
     community: "",
-    bloodCount: [],
+    bloodCount: "",
   },
   setTracker: (tracker) => set({ tracker }),
 }));
