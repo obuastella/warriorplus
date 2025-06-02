@@ -10,19 +10,17 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../../../components/firebase";
 import { toast } from "react-toastify";
+import { useTrackerStore } from "../../../store/trackerStore";
 
 export default function PaymentModal({
   onClose,
   onPaymentSuccess,
-  community, // This is the actual prop being passed
+  community,
 }: any) {
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [paystackLoaded, setPaystackLoaded] = useState(false);
-  const user = auth.currentUser;
-
-  console.log("Selected community in modal: ", community);
-  console.log("USER LOGGED IN ID: ", user?.uid);
+  const user: any = auth.currentUser;
 
   const subscriptionPlans = [
     {
@@ -30,7 +28,7 @@ export default function PaymentModal({
       name: "basic",
       // planCode: "PLN_gk69s1ojaccqmgf",
       price: 499900, // Price in kobo (₦4,999.00)
-      priceDisplay: "₦4,999/month",
+      priceDisplay: "₦4,999/year",
       features: [
         "Access to basic Community",
         "Chat with members",
@@ -43,7 +41,7 @@ export default function PaymentModal({
       name: "Premium",
       // planCode: "PLN_b4citk4cd48m53p",
       price: 899900, // Price in kobo (₦8,999.00)
-      priceDisplay: "₦8,999/month",
+      priceDisplay: "₦8,999/year",
       features: [
         "All Basic features",
         "Access to premium Community",
@@ -58,7 +56,7 @@ export default function PaymentModal({
       name: "VIP",
       // planCode: "PLN_gk69s1ojaccqmgf", // Note: This is the same as basic - you might want to update this
       price: 1299900, // Price in kobo (₦12,999.00)
-      priceDisplay: "₦12,999/month",
+      priceDisplay: "₦12,999/year",
       features: [
         "All Premium features",
         "Priority support",
@@ -74,9 +72,6 @@ export default function PaymentModal({
       typeof community === "string" ? community : community?.id;
     const communityName =
       typeof community === "string" ? "Community" : community?.name;
-
-    console.log("Community ID:", communityId);
-    console.log("Community type:", typeof community);
 
     if (!user || !communityId) {
       throw new Error("User not authenticated or community not selected");
@@ -137,7 +132,7 @@ export default function PaymentModal({
     }
   };
   const handlePaymentSuccess = async (response: any, plan: any) => {
-    console.log("Payment successful!", response);
+    // console.log("Payment successful!", response);
     setLoading(true);
 
     try {
@@ -157,6 +152,7 @@ export default function PaymentModal({
           typeof community === "string" ? "the community" : community?.name
         }!`
       );
+
       onClose();
     } catch (error) {
       console.error("Error processing payment:", error);
@@ -202,7 +198,8 @@ export default function PaymentModal({
     try {
       // Initialize Paystack
       const handler = (window as any).PaystackPop.setup({
-        key: "pk_test_0f1b9523732a874b048286317593cc6137e3383b", // Replace with your actual Paystack public key
+        // key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+        key: import.meta.env.VITE_PAYSTACK_SECRET_KEY,
         email: user.email,
         amount: plan.price, // Amount in kobo
         currency: "NGN",
@@ -257,7 +254,6 @@ export default function PaymentModal({
 
     script.onload = () => {
       setPaystackLoaded(true);
-      console.log("Paystack script loaded successfully");
     };
 
     script.onerror = () => {

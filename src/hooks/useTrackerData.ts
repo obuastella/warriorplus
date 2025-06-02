@@ -16,8 +16,8 @@ const useTrackerData = () => {
           const data = trackerSnap.data();
           setTracker({
             emergencyContact: data.emergencyContact || "",
-            community: data.community || "",
-            bloodCount: Array.isArray(data.bloodCount) ? data.bloodCount : [],
+            community: data.community || "None",
+            bloodCount: data.bloodCount ? data.bloodCount : "None",
           });
         }
       }

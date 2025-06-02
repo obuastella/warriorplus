@@ -5,16 +5,11 @@ import Remainders from "./components/Remainders";
 import Statistics from "./components/Statistics";
 
 export default function Dashboard() {
-  // Create a ref to the blood count component
   const bloodCountRef: any = { current: null };
 
-  const handleBloodCountUpdate = (updatedMetrics: any) => {
-    // Update the blood count component
-    if (bloodCountRef.current) {
-      bloodCountRef.current(updatedMetrics);
-    }
+  const handleBloodCountUpdate = () => {
+    console.log(bloodCountRef.current);
   };
-
   return (
     <div className="space-y-8">
       <Header />

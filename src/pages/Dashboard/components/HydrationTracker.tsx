@@ -7,6 +7,7 @@ import useTrackerData from "../../../hooks/useTrackerData";
 
 export default function HydrationTracker({ onBloodCountUpdate }: any) {
   const { tracker } = useTrackerStore();
+  console.log("tracker:", tracker);
   useTrackerData();
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
@@ -15,17 +16,12 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
     {
       title: "Community",
       icon: <Info color="white" />,
-      status: tracker.community == null ? "None" : tracker.community,
+      status: "Join",
     },
     {
       title: "Blood Count",
       icon: <Users color="white" />,
-      status:
-        tracker && Array.isArray(tracker.bloodCount)
-          ? tracker.bloodCount.length === 0
-            ? "None"
-            : "Registered"
-          : "None",
+      status: "Record",
     },
   ];
   const handleEmergency = () => {
@@ -52,7 +48,10 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
             className="rounded-lg bg-secondary/80 text-white text-sm px-5 p-2 cursor-pointer"
             onClick={handleEmergency}
           >
-            {tracker.emergencyContact === "None" ? "Set" : "Alert Contacts"}
+            {tracker.emergencyContact === "None" ||
+            tracker.emergencyContact === ""
+              ? "Set"
+              : "Alert Contacts"}
           </button>
         </div>
       </div>
@@ -89,10 +88,7 @@ export default function HydrationTracker({ onBloodCountUpdate }: any) {
             className="rounded-lg bg-primary text-white text-sm px-5 p-2 cursor-pointer"
             onClick={() => setShowModal(true)}
           >
-            {Array.isArray(tracker?.bloodCount) &&
-            tracker.bloodCount.length === 0
-              ? "Record"
-              : "Edit"}
+            {tracker.bloodCount === "None" ? "Record" : "Edit"}
           </button>
         </div>
       </div>
