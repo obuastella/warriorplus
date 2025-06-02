@@ -7,7 +7,6 @@ import useTrackerData from "../../../hooks/useTrackerData";
 
 export default function HydrationTracker({ onBloodCountUpdate }: any) {
   const { tracker } = useTrackerStore();
-  console.log("tracker:", tracker);
   useTrackerData();
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
